@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!--
+  Sado Tea Room – browser version of Jane's sado VR project (English & Community Project Lab, Fall 2026).
+  Single file: HTML + CSS + JavaScript. Needs an internet connection the first time for Three.js (r128, from cdnjs) and the Google Fonts.
+  Open it in any modern browser (Chrome, Edge, Safari, Firefox) – no build step, no server needed.
+
+  Structure (search for these comments):
+    renderer, scene, camera   – Three.js setup and the orbit camera (drag / wheel / pinch)
+    materials                 – colours and the tatami / kimono textures
+    room                      – 4.5-mat room, tokonoma, shoji, guest cushion and the guest's belongings
+    host                      – the tea master: torso, head, two-bone IK arms with hands, articulated legs (setLegs)
+    utensils                  – chawan, chasen, natsume, chashaku, kama + lid + water, chakin, mizusashi, futaoki, hishaku, fukusa, kashiki, kensui
+    rest pose & helpers       – REST positions, keyframe sampler, track player (pos / rot / vis / scale / osc)
+    STEPS                     – the choreography: one object per step, with lines, tracks and holds
+    step player               – UI, Next/Repeat/Back, voice
+    guest phases              – fan greeting, sweet, whisking game, drinking sequence
+    secondary motion          – gaze, lean, breathing, grip, pour stream
+    main loop                 – frame()
+  All sizes are in metres (1 unit = 1 m); the host is modelled for a 160 cm adult.
+-->
+<title>Sado Tea Room</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Inter:wght@400;500;600&display=swap">
+<style>
+/* Layout: full-window 3D canvas; HTML overlays — a header strip (title, step pills, camera + voice), a right "ask" drawer, and a bottom subtitle bar with Back / Repeat / Next. */
+:root{
+  --bg:#efece3;--panel:rgba(255,255,255,.88);--panel-solid:#ffffff;--ink:#1f2a24;--muted:#5f6b63;
+  --matcha:#4f7d3a;--matcha-soft:#e3ecd9;--clay:#9a6b4a;--line:#d6d2c6;
+  --display:"Shippori Mincho","Hiragino Mincho ProN","Yu Mincho",Georgia,serif;
+  --body:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#141c18;--panel:rgba(24,33,28,.9);--panel-solid:#1b2520;--ink:#eef1ea;--muted:#a9b5ab;--matcha:#8fbf72;--matcha-soft:#263b2c;--clay:#c99a78;--line:#34453b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#141c18;--panel:rgba(24,33,28,.9);--panel-solid:#1b2520;--ink:#eef1ea;--muted:#a9b5ab;--matcha:#8fbf72;--matcha-soft:#263b2c;--clay:#c99a78;--line:#34453b;color-scheme:dark}
+html,body{height:100%}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);overflow:hidden;position:relative}
+#c{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none;cursor:grab}
+#c.grabbing{cursor:grabbing}
+.ui{position:absolute;pointer-events:none}
+.ui>*{pointer-events:auto}
+#top{top:0;left:0;right:0;z-index:3;display:flex;flex-wrap:wrap;gap:8px;align-items:center;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:10px}
+.brand{background:var(--panel);backdrop-filter:blur(6px);border:1px solid var(--line);border-radius:10px;padding:6px 12px;display:grid;line-height:1.2}
+.brand b{font-family:var(--display);font-size:1.05rem;font-weight:700}
+.brand span{font-size:.7rem;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
+.pills{display:flex;gap:4px;background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:4px}
+.pill{width:28px;height:28px;border-radius:50%;border:0;background:transparent;color:var(--muted);font:600 .8rem var(--body);cursor:pointer}
+.pill[aria-current="step"]{background:var(--matcha);color:#fff}
+.pill.done{color:var(--matcha)}
+.pill:focus-visible,button:focus-visible{outline:2px solid var(--matcha);outline-offset:2px}
+.tools{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap}
+.tbtn{background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:6px 12px;font:500 .8rem var(--body);color:var(--ink);cursor:pointer}
+.tbtn[aria-pressed="true"]{background:var(--matcha-soft);border-color:var(--matcha)}
+#bottom{left:0;right:0;bottom:0;display:grid;justify-items:center;gap:8px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:10px 14px}
+.sub{max-width:720px;width:100%;background:var(--panel);backdrop-filter:blur(6px);border:1px solid var(--line);border-radius:14px;padding:10px 16px;display:grid;gap:3px;min-width:0}
+.sub .t{font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--matcha);font-weight:600;display:flex;justify-content:space-between;gap:8px}
+.sub .en{font-size:1.02rem;line-height:1.4;min-height:1.4em}
+.sub .jp{font-size:.8rem;color:var(--muted)}
+.bar{height:3px;background:var(--line);border-radius:2px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--matcha)}
+.ctrl{display:flex;gap:8px}
+.btn{border:1px solid var(--line);background:var(--panel-solid);color:var(--ink);border-radius:999px;padding:9px 18px;font:600 .9rem var(--body);cursor:pointer}
+.btn.primary{background:var(--matcha);border-color:var(--matcha);color:#fff}
+.btn.primary.pulse{animation:pulse 1.2s ease-in-out infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 8px rgba(79,125,58,.18)}}
+@media (prefers-reduced-motion:reduce){.btn.primary.pulse{animation:none}}
+#ask{top:100px;right:max(16px,env(safe-area-inset-right,0px));width:min(320px,calc(100vw - 32px));background:var(--panel);backdrop-filter:blur(6px);border:1px solid var(--line);border-radius:14px;padding:14px;display:grid;gap:10px;max-height:calc(100% - 200px);overflow:auto}
+#ask h2{margin:0;font-family:var(--display);font-size:1rem}
+#ask p{margin:0;font-size:.85rem;color:var(--muted)}
+.q{border:1px solid var(--line);border-radius:10px;background:var(--panel-solid)}
+.q button{all:unset;display:block;width:100%;padding:8px 10px;font:500 .85rem var(--body);cursor:pointer;box-sizing:border-box}
+.q .a{padding:0 10px 10px;font-size:.85rem;line-height:1.45}
+#tip{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:8px 12px;font-size:.85rem;max-width:260px;transform:translate(-50%,-110%);display:grid;gap:2px}
+#tip b{font-family:var(--display)}
+#tip small{color:var(--muted)}
+#meter{display:none;width:100%;max-width:720px;gap:6px}
+#meter.on{display:grid}
+#meter .bar{height:10px;border-radius:6px}
+#meter span{min-height:1.2em}
+#meter .bar i{transition:width .1s linear}
+#meter span{font-size:.8rem;color:var(--muted)}
+#intro[hidden],#tip[hidden],#guest[hidden]{display:none}
+#guest{top:100px;left:max(16px,env(safe-area-inset-left,0px));width:min(360px,calc(100vw - 32px));background:var(--panel);backdrop-filter:blur(6px);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:grid;gap:10px;max-height:calc(100% - 210px);overflow:auto;z-index:2}
+#guest h2{margin:0;font-family:var(--display);font-size:1rem}
+#guest h3{margin:6px 0 0;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--matcha)}
+#guest p,#guest li{font-size:.85rem;line-height:1.45;margin:0}
+#guest ol,#guest ul{margin:0;padding-left:18px;display:grid;gap:4px}
+#guest .close{justify-self:end;background:none;border:0;color:var(--muted);font:500 .8rem var(--body);cursor:pointer}
+#guest b.jp{font-weight:500;color:var(--muted)}
+#intro{position:absolute;inset:0;display:grid;place-items:center;background:rgba(20,28,24,.55);padding:16px}
+#intro .card{background:var(--panel-solid);color:var(--ink);border-radius:16px;max-width:520px;padding:24px;display:grid;gap:12px;border:1px solid var(--line)}
+#intro h1{font-family:var(--display);margin:0;font-size:1.7rem;line-height:1.2}
+#intro h1 small{display:block;font-size:.6em;color:var(--matcha);font-weight:500;margin-top:4px}
+#intro p{margin:0;line-height:1.5;color:var(--muted);font-size:.95rem}
+#intro ul{margin:0;padding-left:18px;color:var(--ink);font-size:.9rem;line-height:1.6}
+@media (max-width:640px){#ask{display:none}#ask.open{display:grid;top:auto;bottom:150px;max-height:40vh}.brand span{display:none}}
+</style>
+
+</head>
+<body>
+<canvas id="c" aria-label="3D tea room"></canvas>
+
+<div id="top" class="ui">
+  <div class="brand"><b>Sado Tea Room</b><span>Usucha · Urasenke style · browser version</span></div>
+  <div class="pills" id="pills" role="list" aria-label="Steps"></div>
+  <div class="tools">
+    <button class="tbtn" id="camGuest" aria-pressed="true">Guest seat</button>
+    <button class="tbtn" id="camClose" aria-pressed="false">Close-up</button>
+    <button class="tbtn" id="camTop" aria-pressed="false">Overhead</button>
+    <button class="tbtn" id="voice" aria-pressed="false">Voice: off</button>
+    <button class="tbtn" id="askToggle">Ask</button>
+    <button class="tbtn" id="guestToggle">Guest</button>
+  </div>
+</div>
+
+<aside id="guest" class="ui" aria-label="Guest guide" hidden>
+  <button class="close" id="guestClose">Close</button>
+  <h2>How to be a guest</h2>
+  <p>The host makes the tea; the guest has a part too. Here is what to bring and what to do when the bowl comes to you.</p>
+  <h3>What a guest brings <b class="jp">持ち物</b></h3>
+  <ul>
+    <li><b>Kaishi</b> <b class="jp">懐紙</b> – a pack of folded paper. Your sweet is served on it, and a corner wipes the bowl rim afterwards.</li>
+    <li><b>Kuromoji</b> <b class="jp">黒文字</b> – a small wooden pick for cutting and eating the sweet.</li>
+    <li><b>Sensu</b> <b class="jp">扇子</b> – a folded fan. It is never opened: you lay it in front of your knees when you bow, as a polite boundary.</li>
+    <li><b>Fukusa and kobukusa</b> <b class="jp">袱紗・古帛紗</b> – silk cloths; the small one can go under the bowl when you look at it.</li>
+    <li><b>White socks</b> <b class="jp">白足袋・白い靴下</b> – clean feet for the tatami. No watches, rings or strong perfume.</li>
+  </ul>
+  <h3>When the sweet comes <b class="jp">お菓子</b></h3>
+  <ol>
+    <li>Bow to the next guest: <i>Osaki ni</i> (“excuse me for going first”).</li>
+    <li>Take one sweet from the dish onto your kaishi. A main sweet (omogashi, like today's nerikiri) is cut and eaten with the kuromoji; dry sweets (higashi) are picked up with the fingers.</li>
+    <li>Finish it before the tea arrives. Sweet first, tea second. Fold the used kaishi and keep it; nothing is left on the dish.</li>
+  </ol>
+  <h3>When the bowl comes <b class="jp">お茶</b></h3>
+  <ol>
+    <li>Bow to the host: <i>Otemae chōdai itashimasu</i> (“I gratefully receive your tea”).</li>
+    <li>Pick the bowl up with your right hand, set it on your left palm, and raise it slightly in thanks.</li>
+    <li>Turn it clockwise two small turns so you do not drink from the front.</li>
+    <li>Drink in about three sips. A small slurp on the last sip tells the host you finished.</li>
+    <li>Wipe the rim where you drank with your thumb and finger, and wipe your fingers on your kaishi.</li>
+    <li>Turn the bowl back so the front faces the host, and put it down outside the edge of your mat.</li>
+    <li>Look at the bowl (<i>haiken</i>): hold it low, over your knees, and admire the glaze. Then return it with a bow.</li>
+  </ol>
+  <p>You can practise this in Step 8: after whisking, press <b>Drink</b> and follow the prompts.</p>
+</aside>
+
+<aside id="ask" class="ui" aria-label="Ask the tea master">
+  <h2>Ask the tea master</h2>
+  <p id="askHint">Tap a question. Tap a utensil in the room to learn its name.</p>
+  <div id="qs"></div>
+</aside>
+
+<div id="tip" class="ui" hidden></div>
+
+<div id="bottom" class="ui">
+  <div id="meter"><div class="bar"><i id="meterFill"></i></div><span id="meterText">Move your pointer quickly over the bowl to whisk.</span></div>
+  <div class="sub">
+    <div class="t"><span id="stepTitle">Step 1 · Greet the guest</span><span id="stepJp">挨拶</span></div>
+    <div class="en" id="line" aria-live="polite"></div>
+    <div class="jp" id="hint">Drag to look around · scroll or pinch to zoom</div>
+    <div class="bar"><i id="prog"></i></div>
+  </div>
+  <div class="ctrl">
+    <button class="btn" id="back">Back</button>
+    <button class="btn" id="repeat">Repeat</button>
+    <button class="btn primary" id="next">Next</button>
+  </div>
+</div>
+
+<div id="intro">
+  <div class="card">
+    <h1>Sado Tea Room<small>A tea ceremony you can watch in your browser</small></h1>
+    <p>No headset needed. The tea master will make a bowl of usucha, thin tea, in seven steps and explain each one in English. At the end, you whisk a bowl yourself.</p>
+    <ul>
+      <li>Drag to look around, scroll or pinch to zoom.</li>
+      <li>Press <b>Next</b> when you are ready for the next step.</li>
+      <li>Tap any utensil to learn its name. Use <b>Ask</b> for common questions.</li>
+    </ul>
+    <button class="btn primary" id="start">Enter the tea room</button>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function(){
+'use strict';
+/*@MAIN@*/
+})();
+</script>
+
+</body>
+</html>

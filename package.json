@@ -1,0 +1,12 @@
+{
+  "name": "sado-tea-room",
+  "private": true,
+  "engines": { "node": "24.x" },
+  "scripts": {
+    "setup": "npm ci --prefix selector",
+    "typecheck": "npm --prefix selector run typecheck",
+    "test": "node tools/pairs-test.js && node tools/narration-test.js && node tools/fukusa-test.js && node tools/drink-view-test.js",
+    "build": "npm --prefix selector run build && node tools/build.js --public",
+    "preview": "node tools/preview.js"
+  }
+}

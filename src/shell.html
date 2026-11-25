@@ -1,0 +1,425 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!--
+  Sado Tea Room – browser version of a sado VR project.
+  Single file: HTML + CSS + JavaScript. Needs an internet connection the first time for Three.js (r128, from cdnjs) and the Google Fonts.
+  Open it in any modern browser (Chrome, Edge, Safari, Firefox) – no build step, no server needed.
+
+  Structure (search for these comments):
+    renderer, scene, camera   – Three.js setup, the mirrored `stage` (see the note there) and the orbit camera
+    materials, room           – colours and textures; the 4.5-mat room, the scroll (一期一会), the guest's seat and belongings
+    host rig                  – the tea master's SKELETON: a 158 cm adult, fixed bone lengths, two-bone arms, lean instead of stretch,
+                                collision with trunk, lap, floor, kettle and water jar; hand poses (lap, tatami, grips)
+    host                      – connects the choreography to the skeleton: grip places on each utensil (GRIP), gaze, eyes and mouth
+    avatar                    – the body drawn on the skeleton: head with the portrait projected on it, kimono, obi, sleeves, hands, legs
+    utensils                  – chawan, chasen, natsume, chashaku, kama + lid, chakin, mizusashi, futaoki, hishaku, fukusa, kashiki, kensui
+    rest pose & helpers       – REST positions, keyframe sampler, track player (pos / rot / vis / scale / osc)
+    STEPS                     – the choreography: one object per step, with lines, tracks, holds and `poses` (the pose pictures)
+    step player, pose pictures– UI, Next/Repeat/Back, voice; the strip of pose pictures for each step
+    guest phases              – fan greeting, sweet, whisking game, drinking sequence, end card
+    main loop                 – advance() and frame(); Motion "pictures" holds each key pose and switches, "smooth" moves continuously
+  All sizes are in metres (1 unit = 1 m). The host faces +z: her LEFT is +x. The utensils and all tracks live in `stage`, which is mirrored.
+  The portrait of the tea master is a hand-authored SVG (embedded below as a string); its face groups become the avatar's face.
+-->
+<title>Sado Tea Room</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;700&family=Inter:wght@400;500;600&display=swap">
+<style>
+/* Layout: full-window 3D canvas; HTML overlays — a header strip (title, step pills, camera + voice), a right "ask" drawer, and a bottom subtitle bar with Back / Repeat / Next. */
+:root{
+  --bg:#efece3;--panel:rgba(255,255,255,.88);--panel-solid:#ffffff;--ink:#1f2a24;--muted:#5f6b63;
+  --matcha:#4f7d3a;--matcha-soft:#e3ecd9;--clay:#9a6b4a;--line:#d6d2c6;
+  --display:"Shippori Mincho","Hiragino Mincho ProN","Yu Mincho",Georgia,serif;
+  --body:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--bg:#141c18;--panel:rgba(24,33,28,.9);--panel-solid:#1b2520;--ink:#eef1ea;--muted:#a9b5ab;--matcha:#8fbf72;--matcha-soft:#263b2c;--clay:#c99a78;--line:#34453b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#141c18;--panel:rgba(24,33,28,.9);--panel-solid:#1b2520;--ink:#eef1ea;--muted:#a9b5ab;--matcha:#8fbf72;--matcha-soft:#263b2c;--clay:#c99a78;--line:#34453b;color-scheme:dark}
+html,body{height:100%}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);overflow:hidden;position:relative}
+#c{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:none;cursor:grab}
+#c.grabbing{cursor:grabbing}
+.ui{position:absolute;pointer-events:none}
+.ui>*{pointer-events:auto}
+#top{top:0;left:0;right:0;z-index:3;display:flex;flex-wrap:wrap;gap:8px;align-items:center;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:10px}
+.brand{background:var(--panel);backdrop-filter:blur(6px);border:1px solid var(--line);border-radius:10px;padding:6px 12px;display:grid;line-height:1.2}
+.brand b{font-family:var(--display);font-size:1.05rem;font-weight:700}
+.brand span{font-size:.7rem;color:var(--muted);letter-spacing:.08em;text-transform:uppercase}
+.pills{display:flex;gap:4px;background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:4px}
+.pill{width:28px;height:28px;border-radius:50%;border:0;background:transparent;color:var(--muted);font:600 .8rem var(--body);cursor:pointer}
+.pill[aria-current="step"]{background:var(--matcha);color:#fff}
+.pill.done{color:var(--matcha)}
+.pill:focus-visible,button:focus-visible{outline:2px solid var(--matcha);outline-offset:2px}
+.tools{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap}
+.tbtn{background:var(--panel);border:1px solid var(--line);border-radius:999px;padding:6px 11px;font:500 .78rem var(--body);color:var(--ink);cursor:pointer;white-space:nowrap}
+.tbtn[aria-pressed="true"]{background:var(--matcha-soft);border-color:var(--matcha)}
+#bottom{left:0;right:0;bottom:0;display:grid;justify-items:center;gap:8px;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:10px 14px}
+.sub{max-width:720px;width:100%;background:var(--panel);backdrop-filter:blur(6px);border:1px solid var(--line);border-radius:14px;padding:10px 16px;display:grid;gap:3px;min-width:0}
+.sub .t{font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--matcha);font-weight:600;display:flex;justify-content:space-between;gap:8px}
+.sub .t #stepJp{text-transform:none;letter-spacing:.02em;font-weight:500;color:var(--muted);text-align:right}
+.sub .t #stepJp b{font-family:var(--display);font-weight:700;color:var(--ink);font-size:.86rem;margin-right:6px}
+.sub .en{font-size:1.02rem;line-height:1.4;min-height:1.4em}
+.sub .jp{font-size:.8rem;color:var(--muted)}
+.bar{height:3px;background:var(--line);border-radius:2px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--matcha)}
+.ctrl{display:flex;gap:8px}
+.btn{border:1px solid var(--line);background:var(--panel-solid);color:var(--ink);border-radius:999px;padding:9px 18px;font:600 .9rem var(--body);cursor:pointer}
+.btn.primary{background:var(--matcha);border-color:var(--matcha);color:#fff}
+.btn.primary.pulse{animation:pulse 1.2s ease-in-out infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 8px rgba(79,125,58,.18)}}
+@media (prefers-reduced-motion:reduce){.btn.primary.pulse{animation:none}}
+#ask{top:calc(var(--top-h,92px) + 8px);right:max(16px,env(safe-area-inset-right,0px));width:min(320px,calc(100vw - 32px));background:var(--panel);backdrop-filter:blur(6px);border:1px solid var(--line);border-radius:14px;padding:14px;display:grid;gap:10px;max-height:calc(100% - 200px);overflow:auto}
+#ask h2{margin:0;font-family:var(--display);font-size:1rem}
+#ask p{margin:0;font-size:.85rem;color:var(--muted)}
+.q{border:1px solid var(--line);border-radius:10px;background:var(--panel-solid)}
+.q button{all:unset;display:block;width:100%;padding:8px 10px;font:500 .85rem var(--body);cursor:pointer;box-sizing:border-box}
+.q .a{padding:0 10px 10px;font-size:.85rem;line-height:1.45}
+#tip{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:8px 12px;font-size:.85rem;max-width:260px;transform:translate(-50%,-110%);display:grid;gap:2px}
+#tip b{font-family:var(--display)}
+#tip small{color:var(--muted)}
+#meter{display:none;width:100%;max-width:720px;gap:6px}
+#meter.on{display:grid}
+#meter .bar{height:10px;border-radius:6px}
+#meter span{min-height:1.2em}
+#meter .bar i{transition:width .1s linear}
+#meter span{font-size:.8rem;color:var(--muted)}
+.sweet-cut #meterText{justify-self:center;padding:4px 10px;border-radius:10px;background:var(--panel);color:var(--ink)}
+#intro[hidden],#tip[hidden],#guest[hidden],#endCard[hidden]{display:none}
+#endCard{position:absolute;inset:0;z-index:5;display:grid;place-items:center;background:rgba(20,28,24,.5);padding:16px;overflow:auto}
+#endCard .card{background:var(--panel-solid);color:var(--ink);border-radius:16px;max-width:480px;width:100%;padding:22px 24px;display:grid;gap:12px;border:1px solid var(--line)}
+#endCard h2{margin:0;font-family:var(--display);font-size:1.6rem;line-height:1.25}
+#endCard h2 small{display:block;font:500 .85rem var(--body);color:var(--muted);margin-top:4px}
+#endCard p{margin:0;color:var(--muted);font-size:.92rem}
+#endCard ol{margin:0;padding-left:20px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px 18px;font-size:.88rem}
+#endCard ol span{color:var(--muted);font-size:.8rem}
+@media (max-width:520px){#endCard ol{grid-template-columns:1fr}}
+#guest{top:calc(var(--top-h,92px) + 8px);left:max(16px,env(safe-area-inset-left,0px));width:min(360px,calc(100vw - 32px));background:var(--panel);backdrop-filter:blur(6px);border:1px solid var(--line);border-radius:14px;padding:14px 16px;display:grid;gap:10px;max-height:calc(100% - 210px);overflow:auto;z-index:2}
+#guest h2{margin:0;font-family:var(--display);font-size:1rem}
+#guest h3{margin:6px 0 0;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--matcha)}
+#guest p,#guest li{font-size:.85rem;line-height:1.45;margin:0}
+#guest ol,#guest ul{margin:0;padding-left:18px;display:grid;gap:4px}
+#guest .close{justify-self:end;background:none;border:0;color:var(--muted);font:500 .8rem var(--body);cursor:pointer}
+#guest b.jp{font-weight:500;color:var(--muted)}
+#intro{position:absolute;inset:0;z-index:6;display:grid;place-items:center;background:rgba(20,28,24,.6);padding:16px;overflow:auto}
+#intro .card{background:var(--panel-solid);color:var(--ink);border-radius:16px;max-width:880px;width:100%;padding:24px;display:grid;gap:12px;border:1px solid var(--line);min-width:0}
+#intro{place-items:start center}
+#intro>.card{margin-block:auto}
+.pick-h{margin:4px 0 0;font-family:var(--display);font-size:1.1rem}
+/* teacher cards: side by side, stacked on narrow screens; the whole card is the choice (a radio inside the label) */
+.teachers{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (max-width:700px){.teachers{grid-template-columns:minmax(0,1fr)}}
+.tcard{border:1px solid var(--line);border-radius:14px;padding:14px;display:grid;gap:8px;align-content:start;cursor:pointer;background:var(--bg);transition:border-color .15s,box-shadow .15s;min-width:0}
+.tcard.on{border-color:var(--matcha);box-shadow:0 0 0 2px var(--matcha);background:var(--matcha-soft)}
+.tcard:has(input:focus-visible){outline:2px solid var(--matcha);outline-offset:3px}
+.tpick{display:flex;gap:14px;align-items:center;cursor:pointer;min-width:0}
+.tpick img{width:84px;height:101px;border-radius:12px;border:1px solid var(--line);background:var(--panel-solid);object-fit:cover;flex:none}
+.sr{position:absolute;width:1px;height:1px;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0;padding:0}
+.tname{display:grid;gap:2px;min-width:0}
+.tname b{font-family:var(--display);font-size:1.35rem;font-weight:700;line-height:1.2}
+.tname span{font-weight:600;font-size:.92rem}
+.tname i{font-style:normal;color:var(--matcha);color:color-mix(in srgb,var(--matcha) 70%,var(--ink));font-size:.8rem;font-weight:600}
+.tcard .pers{margin:0;font-size:.88rem;line-height:1.5;color:var(--ink)}
+.tcard .pers-ja{margin:0;font-size:.78rem;line-height:1.55;color:var(--muted)}
+.chips{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:6px}
+.chips li{border:1px solid var(--line);background:var(--panel-solid);border-radius:999px;padding:3px 10px;font-size:.76rem;line-height:1.4}
+.chips li [lang="ja"]{color:var(--muted)}
+.tcard .sample{justify-self:start;padding:6px 14px;font-size:.82rem}
+.tcard .say{margin:0;font-size:.82rem;line-height:1.5;border-left:3px solid var(--matcha);padding-left:10px;display:grid;gap:2px}
+.tcard .say[hidden]{display:none}
+.tcard .say small{color:var(--muted)}
+.tcard .credit{color:var(--muted);font-size:.72rem;line-height:1.4}
+.voicebox{display:flex;flex-wrap:wrap;gap:8px 18px;align-items:center}
+.vsel{display:flex;gap:8px;align-items:center;font-size:.85rem;color:var(--muted);min-width:0;max-width:100%}
+.vsel select{font:inherit;color:var(--ink);background:var(--panel-solid);border:1px solid var(--line);border-radius:8px;padding:4px 6px;max-width:min(260px,60vw)}
+.sub .en2{font-size:.84rem;line-height:1.35;color:var(--muted)}
+.sub .en2[hidden]{display:none}
+.q .a .a-en{color:var(--muted);font-size:.8rem;margin-top:4px}
+[data-narration="en"] .q .a [lang="ja"]{display:none}
+[data-narration="en"] .q .a .a-en{color:inherit;font-size:inherit;margin-top:0}
+#intro h1{font-family:var(--display);margin:0;font-size:1.7rem;line-height:1.2}
+.hosthead{display:flex;gap:16px;align-items:center}
+.check{display:flex;gap:8px;align-items:center;font-size:.9rem;cursor:pointer}
+.check input{width:18px;height:18px;accent-color:var(--matcha)}
+.hosthead img{width:96px;height:115px;border-radius:12px;border:1px solid var(--line);background:var(--bg);object-fit:cover;flex:none}
+#poses{top:calc(var(--top-h,92px) + 8px);left:max(16px,env(safe-area-inset-left,0px));display:grid;gap:8px;width:168px;z-index:1;max-height:calc(100% - var(--top-h,92px) - 24px);overflow-y:auto;scrollbar-width:thin;align-content:start}
+#poses[hidden]{display:none}
+.pose{all:unset;pointer-events:auto;box-sizing:border-box;cursor:pointer;display:grid;background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden;opacity:.72;transition:opacity .2s,border-color .2s}
+.pose canvas{display:block;width:100%;height:auto;aspect-ratio:4/3;background:var(--bg)}
+.pose .cap{display:flex;gap:6px;align-items:baseline;padding:4px 8px 6px;font-size:.78rem;line-height:1.25;min-width:0;flex-wrap:wrap}
+.pose .cap i{font-style:normal;font-weight:600;color:var(--matcha);font-variant-numeric:tabular-nums}
+.pose .cap b{font-weight:600}
+.pose .cap [lang="ja"]{color:var(--muted);font-size:.74rem}
+.pose.seen{opacity:.9}
+.pose.on{opacity:1;border-color:var(--matcha);box-shadow:0 0 0 2px var(--matcha)}
+.pose:focus-visible{outline:2px solid var(--matcha);outline-offset:2px}
+@media (max-width:900px),(max-height:620px){
+  #poses{display:flex;width:auto;right:max(16px,env(safe-area-inset-right,0px));overflow-x:auto;scrollbar-width:none;top:calc(var(--top-h,92px) + 2px)}
+  .pose{flex:0 0 92px}
+  .pose .cap{font-size:.68rem;padding:3px 6px 4px;gap:4px}
+  .pose .cap [lang="ja"]{display:none}
+}
+@media (max-height:480px){
+  #poses{display:grid;width:86px;right:auto;overflow-x:hidden;overflow-y:auto;max-height:calc(100% - var(--top-h,60px) - 12px);gap:4px}
+  .pose{flex:none}
+  .pose .cap b,.pose .cap [lang="ja"]{display:none}
+  #ask{display:none}
+  .sub .jp,.sub .t #stepJp{display:none}
+  .sub{padding:6px 12px}
+  #bottom{padding-block:4px 6px;gap:4px}
+  .btn{padding:6px 14px}
+}
+@media (max-width:640px){
+  #top{gap:6px;padding-block:8px}
+  .brand{padding:4px 10px}
+  .brand b{font-size:.95rem}
+  .pills{flex:1 1 0;min-width:0;overflow-x:auto;scrollbar-width:none}
+  .pill{flex:none}
+  .tools{margin-left:0;flex:1 1 100%;flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;padding-right:22px;
+    -webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 26px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 26px),transparent)}
+  /* the panels people look for first stay on screen; the fade at the right edge shows that the strip scrolls */
+  #teacherBtn{order:-2}#askToggle,#guestToggle{order:-1}
+  .tbtn{flex:none;padding:5px 10px;font-size:.74rem}
+  .sub{padding:8px 12px}
+  .sub .en{font-size:.95rem}
+  .btn{padding:9px 14px}
+}
+#intro h1 small{display:block;font-size:.6em;color:var(--matcha);font-weight:500;margin-top:4px}
+#introText{margin:0;line-height:1.5;color:var(--muted);font-size:.95rem}
+#introTips{margin:0;padding-left:18px;color:var(--ink);font-size:.9rem;line-height:1.6}
+@media (max-width:640px){#intro .card{padding:16px}#introTips{display:none}}
+@media (max-width:640px){#ask{display:none}#ask.open{display:grid;top:auto;bottom:150px;max-height:40vh}.brand span{display:none}}
+/* voice engine panel (06-tts): local VOICEVOX / COEIROINK, status line, setup hint, credit */
+#enginePanel{border:1px solid var(--line);border-radius:12px;padding:10px 12px;display:grid;gap:6px;font-size:.85rem;background:var(--bg);min-width:0}
+#enginePanel[hidden]{display:none}
+#enginePanel h3{margin:0;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--matcha);font-weight:600}
+#enginePanel .row{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;justify-content:space-between}
+#enginePanel .check{font-size:.85rem}
+#enginePanel .btn{padding:4px 12px;font-size:.78rem}
+#engineStatus,#engineNow{margin:0;color:var(--muted);line-height:1.45;overflow-wrap:anywhere}
+#engineStatus::before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;background:var(--line);vertical-align:1px}
+#engineStatus[data-state="ok"]::before{background:var(--matcha)}
+#engineStatus[data-state="busy"]::before{background:var(--clay)}
+#engineStatus[data-state="bad"]::before{background:#b8453a}
+#engineCredit{margin:0;font-size:.78rem;color:var(--ink)}
+#engineCredit[hidden]{display:none}
+#enginePanel details{color:var(--muted);line-height:1.5}
+#enginePanel summary{cursor:pointer;color:var(--ink);font-weight:500}
+#enginePanel details ul{margin:4px 0 0;padding-left:18px;display:grid;gap:3px}
+#enginePanel code{font-size:.8em;overflow-wrap:anywhere}
+/* the 3D instructor selector (React bundle, styles inlined below) inside the intro page; the navigator window */
+#intro.has-selector>.card{max-width:1240px;padding:20px 20px 22px}
+#intro.has-selector .selector-host{min-width:0;background:linear-gradient(170deg,#1d2427,#121618 70%);border-radius:14px;color-scheme:dark}
+#intro.has-selector .selector-host #sado-selector .ss-root{padding:16px 18px 18px}
+#intro.has-selector #start{justify-self:center;min-width:min(300px,100%);box-shadow:0 6px 18px rgba(0,0,0,.3)}
+/* sticky only on phones, where the card list is long; scroll-padding keeps a focused card clear of it */
+@media (max-width:640px){#intro.has-selector #start{position:sticky;bottom:10px;z-index:3}#intro.has-selector{scroll-padding-bottom:72px}}
+#navWin{position:absolute;right:16px;bottom:16px;width:200px;z-index:1}
+#navWin,#navWin *{pointer-events:none!important}
+#navWin[hidden]{display:none}
+#navWin .sado-nav{max-width:none;filter:drop-shadow(0 4px 10px rgba(0,0,0,.28))}
+#navWin.compact .sado-nav-plate{padding:3px 8px 4px 9px}
+#navWin.compact .sado-nav-en{font-size:10.5px}
+#navWin.compact .sado-nav-ja{font-size:9.5px}
+#navWin.compact .sado-nav-wave{display:none}
+#navWin.duo{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+#navWin.duo[hidden]{display:none}
+#navWin.duo .sado-nav-plate{padding:5px 8px 7px 10px;min-height:44px}
+#navWin.duo .sado-nav-en{font-size:11px}
+#navWin.duo .sado-nav-wave{display:none}
+#lineSpeaker{font-size:12px;font-weight:600;color:var(--matcha);margin-top:6px}
+.pair-picker{background:var(--matcha-soft);border:1px solid var(--matcha);border-radius:12px;padding:14px;margin:14px 0;display:grid;gap:8px}
+.pair-picker label{font-weight:600}
+.pair-picker select{width:100%;font:inherit;padding:10px;border-radius:8px;color:#26342b;background:#fff;border:1px solid #9ca992}
+.pair-picker p{margin:0;font-size:13px}
+.pair-picker .pair-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+@media (max-width:640px){#intro.has-selector>.card{padding:12px 10px 16px}#intro.has-selector .selector-host #sado-selector .ss-root{padding:12px 10px 14px}}
+#settingsToggle{margin-left:auto;width:42px;height:42px;padding:0;font-size:25px;display:grid;place-items:center}
+#settingsPanel{position:absolute;right:16px;top:calc(var(--top-h,64px) + 8px);width:min(390px,calc(100vw - 32px));max-height:calc(100% - var(--top-h,64px) - 24px);overflow:auto;padding:16px;background:var(--panel-solid);border:1px solid var(--line);border-radius:16px;z-index:4;box-shadow:0 8px 30px #0003}
+#settingsPanel[hidden]{display:none}
+.settings-heading{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.settings-heading h2{margin:0;font:600 1.1rem var(--body)}
+#settingsPanel h3{font-size:.8rem;margin:16px 0 8px;color:var(--muted)}
+#settingsPanel .tools{margin:0;display:flex;flex-wrap:wrap;overflow:visible;padding:0;mask-image:none;gap:8px}
+#settingsPanel .pills{flex-wrap:wrap;border-radius:14px;width:fit-content}
+#settingsPanel #poses{position:static;display:flex;width:100%;max-width:none;max-height:180px;overflow:auto;margin:0;padding:0;gap:8px;pointer-events:auto;mask-image:none}
+#settingsPanel #poses[hidden]{display:none}
+#settingsPanel #poses .pose{flex:0 0 105px;width:105px}
+#bottom{z-index:2;max-height:calc(100% - 76px);overflow-y:auto}
+#bottom #ask{position:static;inset:auto;width:100%;max-width:720px;max-height:160px;display:grid;gap:7px;padding:10px 12px;overflow:auto}
+#bottom #ask h2{font-size:.85rem}
+#bottom #askHint{display:none}
+#bottom #qs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+#bottom .q button{font-size:.8rem;padding:8px}
+#bottom .q button:focus-visible{outline:2px solid var(--matcha);outline-offset:-2px}
+@media(max-width:520px){#bottom #ask{max-height:140px}#bottom{gap:5px;padding-bottom:8px}#bottom .sub{padding:8px 12px}#bottom #qs{gap:5px}}
+</style>
+<!--@SELECTOR_CSS@-->
+</head>
+<body>
+<canvas id="c" aria-label="3D tea room"></canvas>
+
+<div id="top" class="ui">
+  <div class="brand"><b>Sado Tea Room</b><span>Usucha · Urasenke style</span></div>
+  <button class="tbtn" id="settingsToggle" aria-label="Settings" aria-expanded="false" aria-controls="settingsPanel"><span aria-hidden="true">⚙</span></button>
+</div>
+
+<section id="settingsPanel" role="dialog" aria-label="Lesson settings" hidden>
+  <div class="settings-heading"><h2>Settings</h2><button class="tbtn" id="settingsClose" aria-label="Close settings">Close</button></div>
+  <h3>Jump to a step</h3>
+  <div class="pills" id="pills" role="list" aria-label="Steps"></div>
+  <h3>Instructor, view and sound</h3>
+  <div class="tools">
+    <button class="tbtn" id="teacherBtn" title="Choose another teacher (the lesson starts again)">Teacher</button>
+    <button class="tbtn" id="camGuest" aria-pressed="true">Guest seat</button>
+    <button class="tbtn" id="camClose" aria-pressed="false">Close-up</button>
+    <button class="tbtn" id="camTop" aria-pressed="false">Overhead</button>
+    <button class="tbtn" id="camMaster" aria-pressed="false">Master's view</button>
+    <button class="tbtn" id="camBowl" aria-pressed="false" hidden>Look into bowl</button>
+    <button class="tbtn" id="motionBtn" aria-pressed="true" title="Pictures: the host holds each pose like a picture and switches to the next. Smooth: continuous movement.">Motion: pictures</button>
+    <button class="tbtn" id="voice" aria-pressed="false">Voice: off</button>
+    <button class="tbtn" id="guestToggle">Guest</button>
+  </div>
+  <label class="vsel">Narration language <select id="lessonLanguage"><option value="original">Character default</option><option value="en">English</option></select></label>
+  <h3>Key poses</h3>
+<div id="poses" class="ui" aria-label="Pose pictures of this step" hidden></div>
+</section>
+
+<aside id="guest" class="ui" aria-label="Guest guide" hidden>
+  <button class="close" id="guestClose">Close</button>
+  <h2>How to be a guest</h2>
+  <p>The host makes the tea; the guest has a part too. Here is what to bring and what to do when the bowl comes to you.</p>
+  <h3>What a guest brings <b class="jp">持ち物</b></h3>
+  <ul>
+    <li><b>Kaishi</b> <b class="jp">懐紙</b> – a pack of folded paper. Your sweet is served on it, and you wipe your fingers on it after you have wiped the rim of the bowl.</li>
+    <li><b>Kuromoji</b> <b class="jp">黒文字</b> – a small wooden pick for cutting and eating the sweet.</li>
+    <li><b>Sensu</b> <b class="jp">扇子</b> – a folded fan. It is never opened: you lay it in front of your knees when you bow, as a polite boundary.</li>
+    <li><b>Fukusa and kobukusa</b> <b class="jp">帛紗・古帛紗</b> – silk cloths. The small kobukusa is used mainly with thick tea and precious utensils.</li>
+    <li><b>White socks</b> <b class="jp">白足袋・白い靴下</b> – clean feet for the tatami. No watches, rings or strong perfume.</li>
+  </ul>
+  <h3>When the sweet comes <b class="jp">お菓子</b></h3>
+  <ol>
+    <li>Bow to the next guest: <i>Osaki ni</i> (“excuse me for going first”).</li>
+    <li>Take one sweet from the dish onto your kaishi. A main sweet (omogashi, like today's nerikiri) is cut and eaten with the kuromoji; dry sweets (higashi) are picked up with the fingers.</li>
+    <li>Finish it before the tea arrives. Sweet first, tea second. Fold the used kaishi and keep it; nothing is left on the dish.</li>
+  </ol>
+  <h3>When the bowl comes <b class="jp">お茶</b></h3>
+  <ol>
+    <li>Bow to the host: <i>Otemae chōdai itashimasu</i> (“I gratefully receive your tea”).</li>
+    <li>Pick the bowl up with your right hand, set it on your left palm, and raise it slightly in thanks.</li>
+    <li>Turn it clockwise two small turns so you do not drink from the front.</li>
+    <li>Drink in about three sips. A small slurp on the last sip tells the host you finished.</li>
+    <li>Wipe the rim where you drank with your thumb and finger, and wipe your fingers on your kaishi.</li>
+    <li>Turn the bowl back so the front faces you, and put it down outside the edge of your mat.</li>
+    <li>Look at the bowl (<i>haiken</i>): hold it low, over your knees, and admire the glaze. When you hand it back, turn its front to the host.</li>
+  </ol>
+  <p>You can practise this in Step 9: after whisking, press <b>Drink</b> and follow the prompts.</p>
+</aside>
+
+<div id="navWin" class="ui" hidden></div>
+
+<div id="tip" class="ui" hidden></div>
+
+<div id="bottom" class="ui">
+  <div id="meter"><div class="bar"><i id="meterFill"></i></div><span id="meterText">Move your pointer quickly over the bowl to whisk.</span></div>
+  <div class="sub">
+    <div class="t"><span id="stepTitle">Step 1 · Greet the guest</span><span id="stepJp" lang="ja"></span></div>
+    <div id="lineSpeaker" hidden></div>
+    <div class="en" id="line" aria-live="polite"></div>
+    <div class="en2" id="lineEn" hidden></div>
+    <div class="jp" id="hint">Drag to look around · scroll or pinch to zoom</div>
+    <div class="bar"><i id="prog"></i></div>
+  </div>
+  <aside id="ask" aria-label="Ask the tea master">
+    <h2 id="askTitle">Ask the tea master</h2>
+    <p id="askHint">Tap a question. Tap a utensil in the room to learn its name.</p>
+    <div id="qs"></div>
+  </aside>
+  <div class="ctrl">
+    <button class="btn" id="back">Back</button>
+    <button class="btn" id="repeat">Repeat</button>
+    <button class="btn primary" id="next">Next</button>
+  </div>
+</div>
+
+<div id="intro">
+  <div class="card">
+    <h1>Sado Tea Room<small>A tea ceremony you can watch in your browser</small></h1>
+    <p id="introText">No headset needed. Choose your teacher: they will make a bowl of usucha, thin tea, in eight short steps and explain each one. At the end, you whisk a bowl yourself.</p>
+    <div class="pair-picker">
+      <label for="pairPick">Narration team</label>
+      <select id="pairPick" aria-describedby="pairNote"><option value="">Solo · choose an instructor below</option></select>
+      <p id="pairNote">Choose a duo to see both characters and hear them take turns explaining.</p>
+      <div class="pair-actions"><button class="btn primary" id="pairStart" type="button" hidden>Enter with this duo</button><span id="pairSummary" aria-live="polite"></span></div>
+    </div>
+    <h2 class="pick-h" id="pickH">Choose your teacher</h2>
+    <div class="teachers" id="teacherCards" role="radiogroup" aria-labelledby="pickH"></div>
+    <ul id="introTips">
+      <li>Drag to look around, scroll or pinch to zoom.</li>
+      <li>Press <b>Next</b> when you are ready for the next step.</li>
+      <li>Tap any utensil to learn its name. Use <b>Ask</b> for common questions.</li>
+      <li>The small pictures show the key poses of each step. Tap one to jump to it.</li>
+    </ul>
+    <div class="voicebox">
+      <label class="vsel">Narration language <select id="introLanguage"><option value="original">Character default</option><option value="en">English</option></select></label>
+      <label class="check"><input type="checkbox" id="voiceStart" checked> <span id="voiceLabel">Read the explanations aloud (English voice)</span></label>
+      <label class="vsel">Voice <select id="voicePick" aria-label="Voice of the chosen teacher"><option value="">Automatic</option></select></label>
+    </div>
+    <!--@PUBLIC_VOICE_NOTE@-->
+    <button class="btn primary" id="start">Enter the tea room</button>
+  </div>
+</div>
+
+<div id="enginePanel" role="group" aria-labelledby="engineH" hidden>
+  <div class="row">
+    <h3 id="engineH">Voice engine</h3>
+    <button class="btn" id="engineRetry" type="button">Check again</button>
+  </div>
+  <label class="check"><input type="checkbox" id="engineUse"> <span>Use VOICEVOX / COEIROINK running on this PC</span></label>
+  <p id="engineStatus" aria-live="polite">Off: the browser's own voices are used.</p>
+  <p id="engineNow"></p>
+  <p id="engineCredit" hidden></p>
+  <details>
+    <summary>How to set up</summary>
+    <ul>
+      <li>Start VOICEVOX (Zundamon, Shikoku Metan, Kasukabe Tsumugi, the Tohoku sisters) and/or COEIROINK v2 with the 虚音イフ voice on this computer, then tick the box.</li>
+      <li>VOICEVOX: open <code>http://127.0.0.1:50021/setting</code>, set <b>CORS Policy Mode: all</b>, save, and restart the engine.</li>
+      <li>COEIROINK: if it is running but shows as not found, check that the engine accepts requests from other origins (CORS) and restart it.</li>
+      <li>This works from the downloaded HTML file opened on the same PC, not inside the claude.ai preview (the browser blocks it there).</li>
+      <li>Kotonoha Akane and Aoi (A.I.VOICE) and the Yukkuri voices (AquesTalk) cannot be reached from a web page; they use the browser's voices.</li>
+    </ul>
+  </details>
+</div>
+
+<div id="endCard" hidden>
+  <div class="card">
+    <h2><span lang="ja">ごちそうさまでした</span><small>Gochisōsama deshita · “Thank you for the tea.”</small></h2>
+    <p>You watched a bowl of usucha being made and received it as a guest. This is a shortened lesson: carrying the utensils in and the closing of the ceremony are left out, and the guest sits opposite the host so that everything can be seen.</p>
+    <ol>
+      <li>The bow together <span lang="ja">総礼</span></li>
+      <li>The sweet <span lang="ja">お菓子</span></li>
+      <li>Purifying the utensils <span lang="ja">清め</span></li>
+      <li>Warming the bowl <span lang="ja">茶碗を温める</span></li>
+      <li>Matcha, one scoop and a half <span lang="ja">抹茶</span></li>
+      <li>Hot water <span lang="ja">湯</span></li>
+      <li>Whisking <span lang="ja">点てる</span></li>
+      <li>Offering the bowl, front to the guest <span lang="ja">正面</span></li>
+    </ol>
+    <div class="ctrl"><button class="btn primary" id="endAgain">Watch again</button><button class="btn" id="endWhisk">Whisk another bowl</button></div>
+  </div>
+</div>
+
+<!--@SELECTOR_JS@-->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function(){
+'use strict';
+/*@MAIN@*/
+})();
+</script>
+
+</body>
+</html>

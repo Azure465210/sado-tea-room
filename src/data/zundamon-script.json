@@ -1,0 +1,607 @@
+{
+  "teacher": "zundamon",
+  "steps": [
+    {
+      "lines": [
+        [
+          2.5,
+          {
+            "ja": "いらっしゃいなのだ。楽に座るのだ。",
+            "en": "Welcome! Sit nice and comfy, okay?",
+            "yomi": "いらっしゃいなのだ。らくにすわるのだ。"
+          }
+        ],
+        [
+          5.2,
+          {
+            "ja": "今日は静江先生が、キミに薄茶を一服点ててくれるのだ。解説はボクにおまかせなのだ！",
+            "en": "Today Shizue-sensei is making you a bowl of thin tea, usucha. Leave the commentary to me!",
+            "yomi": "きょうは、しずえせんせいが、きみにうすちゃをいっぷく、たててくれるのだ。かいせつは、ぼくにおまかせなのだ。"
+          }
+        ],
+        [
+          12.6,
+          {
+            "ja": "お菓子、それからお茶。用意できたら「Next」！",
+            "en": "Sweet first, then the tea. Ready? Hit Next!",
+            "yomi": "おかし、それからおちゃ。よういできたら、ねくすと。"
+          }
+        ]
+      ],
+      "qs": [
+        [
+          {
+            "ja": "亭主はなぜお辞儀をするのですか？",
+            "en": "Why does the host bow?"
+          },
+          {
+            "ja": "お辞儀はね、茶室で会うときの始まりと終わりの合図なのだ。「来てくれてうれしい、精一杯おもてなしする」って気持ちを伝えてるのだ。",
+            "en": "A bow opens and closes every meeting in the tea room. It says: 'I'm so glad you came, and I'll do my very best for you.' That's what it means!",
+            "yomi": "おじぎはね、ちゃしつであうときの、はじまりとおわりのあいずなのだ。きてくれてうれしい、せいいっぱいおもてなしする、ってきもちをつたえてるのだ。"
+          }
+        ],
+        [
+          {
+            "ja": "どこに座ればいいですか？",
+            "en": "Where should I sit?"
+          },
+          {
+            "ja": "本物の茶室では、お客さんは亭主の右側に一列に並んで、畳にじかに座るのだ。ここではキミの席は先生の真正面。先生のすること、ぜーんぶ見える特等席なのだ！",
+            "en": "In a real tea room the guests sit in a row on the host's right, straight on the tatami. Here your seat is right in front of Sensei, so you can see everything she does. Best seat in the house!",
+            "yomi": "ほんものの、ちゃしつでは、おきゃくさんは、ていしゅのみぎがわにいちれつにならんで、たたみにじかにすわるのだ。ここでは、きみのせきは、せんせいのましょうめん。せんせいのすること、ぜーんぶみえる、とくとうせきなのだ。"
+          }
+        ]
+      ]
+    },
+    {
+      "lines": [
+        [
+          0.5,
+          {
+            "ja": "お菓子をどうぞなのだ。これは練り切り。白あんで季節の形に作った、やわらかい主菓子なのだ。",
+            "en": "Have a sweet! This is nerikiri, a soft main sweet of white bean paste, shaped for the season.",
+            "yomi": "おかしをどうぞなのだ。これはねりきり。しろあんできせつのかたちにつくった、やわらかいおもがしなのだ。"
+          }
+        ],
+        [
+          8,
+          {
+            "ja": "懐紙に一つ取って、黒文字で切るのだ。お茶が来る前に食べ切るのだ。",
+            "en": "Take one onto your kaishi paper and cut it with the kuromoji pick. Finish it before the tea comes!",
+            "yomi": "かいしにひとつとって、くろもじできるのだ。おちゃがくるまえに、たべきるのだ。"
+          }
+        ],
+        [
+          13.5,
+          {
+            "ja": "薄茶には干菓子も多いのだ。今日は主菓子、だから黒文字！",
+            "en": "With thin tea, light dry sweets, higashi, are common too. Today it's a main sweet, so: the pick!",
+            "yomi": "うすちゃには、ひがしもおおいのだ。きょうはおもがし、だからくろもじ。"
+          }
+        ]
+      ],
+      "qs": [
+        [
+          {
+            "ja": "なぜお菓子を先に食べるのですか？",
+            "en": "Why eat the sweet first?"
+          },
+          {
+            "ja": "甘さがお口に残ってると、ちょっと苦い抹茶がまろやかで、すっきり感じられるのだ。お茶と一緒には絶対食べないのだ。……ずんだ餅でも、なのだ。",
+            "en": "The sweetness lines your mouth, so the slightly bitter matcha tastes round and clean. You never eat it with the tea… not even zunda mochi!",
+            "yomi": "あまさがおくちにのこってると、ちょっとにがいまっちゃが、まろやかで、すっきりかんじられるのだ。おちゃといっしょには、ぜったいたべないのだ。ずんだもちでも、なのだ。"
+          }
+        ],
+        [
+          {
+            "ja": "干菓子とは何ですか？",
+            "en": "What is higashi?"
+          },
+          {
+            "ja": "砂糖を押し固めた、乾いたお菓子なのだ。お花や葉っぱの形が多いのだ。指でつまんで食べるから黒文字はいらなくて、たいてい薄茶と一緒に出るのだ。",
+            "en": "Dry pressed sugar sweets, often shaped like flowers or leaves. You pick them up with your fingers, so no kuromoji needed, and they usually go with thin tea.",
+            "yomi": "さとうをおしかためた、かわいたおかしなのだ。おはなや、はっぱのかたちがおおいのだ。ゆびでつまんでたべるから、くろもじはいらなくて、たいてい、うすちゃといっしょにでるのだ。"
+          }
+        ]
+      ]
+    },
+    {
+      "lines": [
+        [
+          0.4,
+          {
+            "ja": "まず先生は、お茶碗と、お茶の入れ物の棗と、茶筅を膝の前に運ぶのだ。",
+            "en": "First, Sensei brings the bowl, the tea container and the whisk in front of her knees.",
+            "yomi": "まずせんせいは、おちゃわんと、おちゃのいれものの、なつめと、ちゃせんを、ひざのまえにはこぶのだ。"
+          }
+        ],
+        [
+          8.5,
+          {
+            "ja": "帛紗は斜めに折った三角形から始めます。角を持ち、右肘を上げます。",
+            "en": "Start with the fukusa already folded diagonally into a triangle. Hold the corners and raise the right elbow.",
+            "yomi": "ふくさはななめにおったさんかくけいからはじめます。かどをもち、みぎひじをあげます。"
+          }
+        ],
+        [
+          17,
+          {
+            "ja": "端を折り込み、左の親指を軸に半分に畳み、右の人差し指で折り目をつけます。この帛紗で棗を清めます。",
+            "en": "Tuck the loose edge, fold over the left thumb, and crease the tail with the right index finger. The folded pad is ready for the natsume.",
+            "yomi": "はしをおりこみ、ひだりのおやゆびをじくにはんぶんにたたみ、みぎのひとさしゆびでおりめをつけます。このふくさでなつめをきよめます。"
+          }
+        ],
+        [
+          33,
+          {
+            "ja": "次は竹の茶杓。すーっ、すーっ、すーっと三回拭くのだ。先生、かっこいいのだ！",
+            "en": "Next, the bamboo scoop, the chashaku: swish, swish, swish, three wipes along it. Sensei's so cool!",
+            "yomi": "つぎは、たけのちゃしゃく。すーっ、すーっ、すーっと、さんかいふくのだ。せんせい、かっこいいのだ。"
+          }
+        ],
+        [
+          40,
+          {
+            "ja": "道具はもともときれいなのだ。これは心を落ち着けて、キミへの敬意を表すためなのだ。",
+            "en": "The tools are already clean, you know. This is to calm her mind and to show respect to you.",
+            "yomi": "どうぐは、もともときれいなのだ。これは、こころをおちつけて、きみへの、けいいをあらわすためなのだ。"
+          }
+        ]
+      ],
+      "qs": [
+        [
+          {
+            "ja": "帛紗は掃除のためだけのものですか？",
+            "en": "Is the fukusa only for cleaning?"
+          },
+          {
+            "ja": "ちがうのだ。道具はお点前の前からきれいなのだ。キミの前で拭くのは、道具じゃなくて心を整えるためなのだ。",
+            "en": "Nope! The utensils are clean before the ceremony starts. Wiping them in front of you prepares the heart, not the object.",
+            "yomi": "ちがうのだ。どうぐは、おてまえのまえから、きれいなのだ。きみのまえでふくのは、どうぐじゃなくて、こころをととのえるためなのだ。"
+          }
+        ],
+        [
+          {
+            "ja": "帛紗はどう畳むのですか？",
+            "en": "How is the fukusa folded?"
+          },
+          {
+            "ja": "三角形の右角を上げ、左手で辺の中央を持ち直して端を折り込みます。左の手のひらを上に向け、親指を軸に半分に畳んだあと、右の人差し指で折り目をつけて右手で受け取ります。",
+            "en": "Start with the diagonal triangle. Raise the right corner and regrip the middle of the edge with the left hand to tuck the loose silk. Turn the left palm up, fold over the thumb, and use the right index to crease and tuck the tail before taking it in the right hand.",
+            "yomi": "さんかくけいのみぎかどをあげ、ひだりてでへんのちゅうおうをもちなおしてはしをおりこみます。ひだりのてのひらをうえにむけ、おやゆびをじくにはんぶんにたたんだあと、みぎのひとさしゆびでおりめをつけてみぎてでうけとります。"
+          }
+        ]
+      ]
+    },
+    {
+      "lines": [
+        [
+          0.5,
+          {
+            "ja": "柄杓を左手で、手鏡みたいにまっすぐ持つのだ。右手は帛紗で釜のふたを開けて、蓋置にのせるのだ。",
+            "en": "She takes the ladle, the hishaku, in her left hand and holds it upright, like a hand mirror. Her right hand opens the kettle lid with the fukusa and rests it on the futaoki.",
+            "yomi": "ひしゃくをひだりてで、てかがみみたいに、まっすぐもつのだ。みぎては、ふくさで、かまのふたをあけて、ふたおきにのせるのだ。"
+          }
+        ],
+        [
+          11,
+          {
+            "ja": "湿った茶巾は、茶碗からふたへ。",
+            "en": "The damp linen cloth, the chakin, comes out of the bowl and waits on the lid.",
+            "yomi": "しめったちゃきんは、ちゃわんから、ふたへ。"
+          }
+        ],
+        [
+          14,
+          {
+            "ja": "さあ、茶碗を温めるのだ。釜からお湯を柄杓に一杯。……ボクが入ったら、塩ゆで枝豆になっちゃうのだ。",
+            "en": "Now she warms the bowl: one ladle of hot water from the kettle. …If I jumped in, I'd come out as salted edamame!",
+            "yomi": "さあ、ちゃわんをあたためるのだ。かまからおゆを、ひしゃくにいっぱい。ぼくがはいったら、しおゆでえだまめに、なっちゃうのだ。"
+          }
+        ],
+        [
+          25.5,
+          {
+            "ja": "柄杓を釜に置いて、温かいお湯の中で茶筅を確かめるのだ。持ち上げて、穂先をよーく見るのだ。",
+            "en": "She rests the ladle on the kettle and checks the whisk in the warm water, lifting it to look closely at the tines.",
+            "yomi": "ひしゃくをかまにおいて、あたたかいおゆのなかで、ちゃせんをたしかめるのだ。もちあげて、ほさきをよーくみるのだ。"
+          }
+        ],
+        [
+          38.5,
+          {
+            "ja": "そのお湯は、左の建水に捨てるのだ。",
+            "en": "Then she pours the water into the waste bowl, the kensui, on her left.",
+            "yomi": "そのおゆは、ひだりのけんすいに、すてるのだ。"
+          }
+        ],
+        [
+          42.5,
+          {
+            "ja": "そして、茶巾で茶碗をふきふきするのだ。",
+            "en": "And she wipes the bowl with the chakin. Wipe, wipe!",
+            "yomi": "そして、ちゃきんで、ちゃわんを、ふきふきするのだ。"
+          }
+        ]
+      ],
+      "qs": [
+        [
+          {
+            "ja": "なぜ茶筅を持ち上げるのですか？",
+            "en": "Why lift the whisk?"
+          },
+          {
+            "ja": "茶筅通しっていうのだ。穂先が一本も折れてないか確かめて、温かいお湯で竹をやわらかくして、点ててる途中で折れないようにするのだ。",
+            "en": "It's called chasen-tōshi. The host checks that no tine is broken, and softens the bamboo in warm water so it doesn't snap while whisking.",
+            "yomi": "ちゃせんどおしっていうのだ。ほさきがいっぽんもおれてないか、たしかめて、あたたかいおゆで、たけをやわらかくして、たててるとちゅうで、おれないようにするのだ。"
+          }
+        ],
+        [
+          {
+            "ja": "なぜ布で蓋を開けるのですか？",
+            "en": "Why open the lid with the cloth?"
+          },
+          {
+            "ja": "鉄のふたは熱いのだ！畳んだ帛紗が指を守ってくれるのだ。ふたは竹の蓋置にのせて、畳の上には絶対置かないのだ。",
+            "en": "The iron lid is hot! The folded fukusa protects the fingers, and the lid rests on the bamboo futaoki, never on the tatami.",
+            "yomi": "てつのふたは、あついのだ。たたんだふくさが、ゆびをまもってくれるのだ。ふたは、たけのふたおきにのせて、たたみのうえには、ぜったいおかないのだ。"
+          }
+        ]
+      ]
+    },
+    {
+      "lines": [
+        [
+          0.5,
+          {
+            "ja": "棗を左手に持って、右手でふたを取り、茶碗の横に置くのだ。",
+            "en": "She holds the tea container, the natsume, in her left hand, lifts the lid with her right and rests it beside the bowl.",
+            "yomi": "なつめをひだりてにもって、みぎてでふたをとり、ちゃわんのよこにおくのだ。"
+          }
+        ],
+        [
+          7,
+          {
+            "ja": "抹茶を茶杓で一杯、それから半分。薄茶は一杯半なのだ。覚えたのだ？",
+            "en": "One scoop of matcha, and then half a scoop. One and a half for thin tea. Got that?",
+            "yomi": "まっちゃを、ちゃしゃくでいっぱい、それからはんぶん。うすちゃは、いっぱいはんなのだ。おぼえたのだ？"
+          }
+        ],
+        [
+          16,
+          {
+            "ja": "茶杓で縁を軽くコツンとして、ふたを戻したら、棗は元の場所に戻るのだ。",
+            "en": "A light tap of the scoop on the rim, then the lid goes back and the natsume returns to its place.",
+            "yomi": "ちゃしゃくで、ふちをかるく、こつんとして、ふたをもどしたら、なつめは、もとのばしょにもどるのだ。"
+          }
+        ]
+      ],
+      "qs": [
+        [
+          {
+            "ja": "抹茶はどのくらいの量ですか？",
+            "en": "How much matcha is that?"
+          },
+          {
+            "ja": "だいたい2グラム、茶杓にたっぷり一杯と半分なのだ。濃茶だと、一人につき三杯くらい使うのだ。",
+            "en": "About 2 grams: one full scoop and a half. For thick tea, koicha, the host uses about three scoops per person.",
+            "yomi": "だいたいにぐらむ、ちゃしゃくに、たっぷりいっぱいと、はんぶんなのだ。こいちゃだと、ひとりにつき、さんばいくらいつかうのだ。"
+          }
+        ],
+        [
+          {
+            "ja": "なぜ茶杓を打つのですか？",
+            "en": "Why tap the scoop?"
+          },
+          {
+            "ja": "縁を軽くコツンとすると、茶杓に残った最後の粉まで、茶碗に落ちるのだ。",
+            "en": "A light tap on the rim drops the very last of the powder from the scoop into the bowl.",
+            "yomi": "ふちをかるくこつんとすると、ちゃしゃくにのこった、さいごのこなまで、ちゃわんにおちるのだ。"
+          }
+        ]
+      ]
+    },
+    {
+      "lines": [
+        [
+          0.5,
+          {
+            "ja": "釜からお湯を柄杓に一杯。でも茶碗に注ぐのは、その一部だけなのだ。",
+            "en": "One ladle of hot water from the kettle, but she pours only part of it into the bowl.",
+            "yomi": "かまからおゆを、ひしゃくにいっぱい。でも、ちゃわんにそそぐのは、そのいちぶだけなのだ。"
+          }
+        ],
+        [
+          9,
+          {
+            "ja": "60ミリリットルくらい。多いと水っぽいのだ。",
+            "en": "About sixty millilitres. Too much water makes it watery.",
+            "yomi": "ろくじゅうみりりっとるくらい。おおいと、みずっぽいのだ。"
+          }
+        ],
+        [
+          13,
+          {
+            "ja": "残りは釜に戻すのだ。一滴も無駄にしないのだ。えらいのだ！",
+            "en": "The rest goes back into the kettle, so nothing is wasted. Very sensible!",
+            "yomi": "のこりは、かまにもどすのだ。いってきも、むだにしないのだ。えらいのだ。"
+          }
+        ]
+      ],
+      "qs": [
+        [
+          {
+            "ja": "お湯の温度は？",
+            "en": "How hot is the water?"
+          },
+          {
+            "ja": "釜の中では、沸騰する少し手前なのだ。茶碗に届くころには、だいたい80度なのだ。",
+            "en": "Just under the boil in the kettle. By the time it reaches the bowl it is about 80 °C.",
+            "yomi": "かまのなかでは、ふっとうするすこしてまえなのだ。ちゃわんにとどくころには、だいたいはちじゅうどなのだ。"
+          }
+        ],
+        [
+          {
+            "ja": "なぜお湯を釜に戻すのですか？",
+            "en": "Why return water to the kettle?"
+          },
+          {
+            "ja": "いつも柄杓に一杯くむと、動きが毎回同じになるのだ。いらない分は釜に返す。何も無駄にならないのだ。",
+            "en": "The host always scoops a full ladle, so the movement is the same every time, then returns what is not needed. Nothing is wasted.",
+            "yomi": "いつも、ひしゃくにいっぱいくむと、うごきがまいかいおなじになるのだ。いらないぶんは、かまにかえす。なにも、むだにならないのだ。"
+          }
+        ]
+      ]
+    },
+    {
+      "lines": [
+        [
+          0.5,
+          {
+            "ja": "いよいよ点てるのだ！左手で茶碗を押さえて、茶筅は手首から素早く。Mの字を書くみたいに動かすのだ。",
+            "en": "Here comes the whisking! Her left hand holds the bowl; the whisk moves quickly from the wrist, like writing the letter M.",
+            "yomi": "いよいよたてるのだ。ひだりてで、ちゃわんをおさえて、ちゃせんは、てくびからすばやく。えむのじをかくみたいに、うごかすのだ。"
+          }
+        ],
+        [
+          10,
+          {
+            "ja": "泡がきめ細かく、なめらかになってきたのだ。おいしそうなのだ！",
+            "en": "The foam's getting fine and smooth. Looks yummy!",
+            "yomi": "あわが、きめこまかく、なめらかになってきたのだ。おいしそうなのだ。"
+          }
+        ],
+        [
+          15,
+          {
+            "ja": "最後はゆっくり円を描いて、真ん中から茶筅をすっと持ち上げるのだ。ボクもやってみたいのだ！",
+            "en": "At the end she moves slowly in a circle and lifts the whisk from the centre. I want a go too!",
+            "yomi": "さいごは、ゆっくりえんをえがいて、まんなかから、ちゃせんをすっと、もちあげるのだ。ぼくも、やってみたいのだ。"
+          }
+        ]
+      ],
+      "qs": [
+        [
+          {
+            "ja": "なぜそんなに速く？",
+            "en": "Why so fast?"
+          },
+          {
+            "ja": "速く振ると、粉がお湯にほどけて、きめ細かい泡ができるのだ。ゆっくり混ぜると、だまが残っちゃうのだ。",
+            "en": "Fast strokes break the powder into the water and build fine foam. Slow stirring leaves lumps!",
+            "yomi": "はやくふると、こながおゆにほどけて、きめこまかいあわができるのだ。ゆっくりまぜると、だまがのこっちゃうのだ。"
+          }
+        ],
+        [
+          {
+            "ja": "泡は大切ですか？",
+            "en": "Does the foam matter?"
+          },
+          {
+            "ja": "裏千家では大事なのだ。細かい泡がなめらかに一面に広がるのがいいのだ。泡が少ないほうが好きな流派もあるけど、どっちも正しいのだ。",
+            "en": "In Urasenke, yes: a smooth layer of small bubbles. Other schools prefer less foam. Both are correct!",
+            "yomi": "うらせんけでは、だいじなのだ。こまかいあわが、なめらかにいちめんにひろがるのがいいのだ。あわがすくないほうがすきな、りゅうはもあるけど、どっちもただしいのだ。"
+          }
+        ]
+      ]
+    },
+    {
+      "lines": [
+        [
+          0.5,
+          {
+            "ja": "お茶ができたのだ。右手で取って、左の手のひらへ。",
+            "en": "Your tea is ready! She takes the bowl in her right hand and rests it on her left palm.",
+            "yomi": "おちゃができたのだ。みぎてでとって、ひだりのてのひらへ。"
+          }
+        ],
+        [
+          5,
+          {
+            "ja": "時計回りに二回、四分の一ずつ回して、正面をキミの方に向けるのだ。",
+            "en": "She turns it clockwise twice, a quarter turn each time, so the front faces you.",
+            "yomi": "とけいまわりに、にかい、よんぶんのいちずつまわして、しょうめんを、きみのほうにむけるのだ。"
+          }
+        ],
+        [
+          12,
+          {
+            "ja": "置いたのだ。飲む前は時計回り、正面を避けるのだ。",
+            "en": "And there it goes, in front of you. Before you drink, turn it clockwise like she did, so your lips don't touch the front.",
+            "yomi": "おいたのだ。のむまえは、とけいまわり、しょうめんをさけるのだ。"
+          }
+        ],
+        [
+          16.4,
+          {
+            "ja": "さあ、召し上がれなのだ。先生は静かに待ってるのだ。",
+            "en": "Go on, enjoy it! Sensei waits quietly while you drink.",
+            "yomi": "さあ、めしあがれなのだ。せんせいは、しずかにまってるのだ。"
+          }
+        ]
+      ],
+      "qs": [
+        [
+          {
+            "ja": "受け取る時は何と言えばいいですか？",
+            "en": "What do I say when I receive it?"
+          },
+          {
+            "ja": "軽く頭を下げて「お点前頂戴いたします」って言うのだ。ありがたくいただきます、って意味なのだ。英語なら、シンプルに thank you で大丈夫なのだ。",
+            "en": "Bow slightly and say 'Otemae chōdai itashimasu': I gratefully receive your tea. In English, a simple thank you is welcome!",
+            "yomi": "かるくあたまをさげて、おてまえちょうだいいたします、っていうのだ。ありがたくいただきます、っていみなのだ。えいごなら、しんぷるに、さんきゅーで、だいじょうぶなのだ。"
+          }
+        ],
+        [
+          {
+            "ja": "どうやって飲むのですか？",
+            "en": "How do I drink?"
+          },
+          {
+            "ja": "右手で茶碗を取って、左の手のひらにのせて、時計回りに二回回してから、三口くらいで飲むのだ。飲み口を指でふいて、茶碗を回して戻して、置くのだ。",
+            "en": "Lift the bowl with your right hand, rest it on your left palm, turn it clockwise twice, and drink in about three sips. Wipe the rim with your fingers, turn the bowl back, and set it down.",
+            "yomi": "みぎてで、ちゃわんをとって、ひだりのてのひらにのせて、とけいまわりに、にかいまわしてから、みくちくらいでのむのだ。のみぐちをゆびでふいて、ちゃわんをまわしてもどして、おくのだ。"
+          }
+        ]
+      ]
+    },
+    {
+      "lines": [
+        [
+          0,
+          {
+            "ja": "本当のお茶会では、点てるのは亭主だけなのだ。でもここでは、キミもやってみていいのだ！そのあと、お客さんとして飲むのだ。",
+            "en": "At a real gathering only the host whisks. But here, you get to try it! Then you drink it as a guest.",
+            "yomi": "ほんとうのおちゃかいでは、たてるのは、ていしゅだけなのだ。でもここでは、きみも、やってみていいのだ。そのあと、おきゃくさんとして、のむのだ。"
+          }
+        ]
+      ],
+      "qs": [
+        [
+          {
+            "ja": "うまく点てるこつは？",
+            "en": "What am I doing right?"
+          },
+          {
+            "ja": "茶筅はまっすぐ立てて、腕じゃなくて手首を動かすのだ。力いっぱいより、速く軽くのほうがいいのだ。",
+            "en": "Keep the whisk upright and move your wrist, not your arm. Quick and light beats strong, every time!",
+            "yomi": "ちゃせんは、まっすぐたてて、うでじゃなくて、てくびをうごかすのだ。ちからいっぱいより、はやくかるくのほうがいいのだ。"
+          }
+        ],
+        [
+          {
+            "ja": "泡がむらになったら？",
+            "en": "What if the foam is uneven?"
+          },
+          {
+            "ja": "最後にゆっくり一回円を描いて、茶碗の真ん中から茶筅を持ち上げるのだ。大きな泡は消えちゃうのだ。",
+            "en": "Finish with one slow circle and lift the whisk from the centre of the bowl. The big bubbles disappear!",
+            "yomi": "さいごに、ゆっくりいっかい、えんをえがいて、ちゃわんのまんなかから、ちゃせんをもちあげるのだ。おおきなあわは、きえちゃうのだ。"
+          }
+        ]
+      ]
+    }
+  ],
+  "guestIntro": [
+    {
+      "ja": "今度はキミがお客さんなのだ。まずはごあいさつ。閉じた扇子を膝の前に置いて、亭主にお辞儀するのだ。",
+      "en": "Now you're the guest! First the greeting: lay your closed fan in front of your knees and bow to the host.",
+      "yomi": "こんどは、きみがおきゃくさんなのだ。まずは、ごあいさつ。とじたせんすを、ひざのまえにおいて、ていしゅに、おじぎするのだ。"
+    },
+    {
+      "ja": "次はお菓子なのだ。お皿から練り切りを一つ懐紙に取って、黒文字で切って、三口で食べるのだ。",
+      "en": "Next, the sweet! Take one nerikiri from the dish onto your kaishi, cut it with the kuromoji and eat it in three bites.",
+      "yomi": "つぎは、おかしなのだ。おさらから、ねりきりをひとつ、かいしにとって、くろもじできって、みくちでたべるのだ。"
+    },
+    {
+      "ja": "本当は、点てるのは亭主だけなのだ。でもここでは試していいのだ！茶碗の上でポインターを左右に素早く動かして、泡がなめらかになるまで点てるのだ。",
+      "en": "In a real gathering only the host whisks. But here you may try it! Move your pointer quickly from side to side over the bowl until the foam is smooth.",
+      "yomi": "ほんとうは、たてるのは、ていしゅだけなのだ。でもここでは、ためしていいのだ。ちゃわんのうえで、ぽいんたーを、さゆうにすばやくうごかして、あわがなめらかになるまで、たてるのだ。"
+    }
+  ],
+  "guestDrink": [
+    {
+      "ja": "まず亭主にお辞儀して、「お点前頂戴いたします」って言うのだ。ありがたくいただきます、って意味なのだ。",
+      "en": "First, bow to the host and say 'Otemae chōdai itashimasu': I gratefully receive your tea.",
+      "yomi": "まず、ていしゅにおじぎして、おてまえちょうだいいたします、っていうのだ。ありがたくいただきます、っていみなのだ。"
+    },
+    {
+      "ja": "右手で茶碗を持ち上げて、左の手のひらにのせて、ありがとうの気持ちで少し上げるのだ。",
+      "en": "Pick the bowl up with your right hand, rest it on your left palm, and raise it a little to say thank you.",
+      "yomi": "みぎてで、ちゃわんをもちあげて、ひだりのてのひらにのせて、ありがとうのきもちで、すこしあげるのだ。"
+    },
+    {
+      "ja": "茶碗を時計回りに、小さく二回回すのだ。正面から飲まないためなのだ。",
+      "en": "Turn the bowl clockwise, two small turns, so you don't drink from its front.",
+      "yomi": "ちゃわんを、とけいまわりに、ちいさくにかいまわすのだ。しょうめんから、のまないためなのだ。"
+    },
+    {
+      "ja": "三口くらいで飲むのだ。最後の一口で小さくズズッと音を立てると、飲み終わったよって合図になるのだ。",
+      "en": "Drink in about three sips. On the last sip, a small slurp tells the host you've finished.",
+      "yomi": "みくちくらいで、のむのだ。さいごのひとくちで、ちいさく、ずずっとおとをたてると、のみおわったよって、あいずになるのだ。"
+    },
+    {
+      "ja": "口をつけたところを親指と人差し指でふいて、その指は懐紙でふくのだ。",
+      "en": "Wipe the rim where your lips touched with your thumb and finger, then wipe your fingers on your kaishi.",
+      "yomi": "くちをつけたところを、おやゆびと、ひとさしゆびでふいて、そのゆびは、かいしでふくのだ。"
+    },
+    {
+      "ja": "茶碗を回して戻して、正面をまた自分の方に向けるのだ。",
+      "en": "Turn the bowl back, so its front faces you again.",
+      "yomi": "ちゃわんをまわしてもどして、しょうめんを、またじぶんのほうにむけるのだ。"
+    },
+    {
+      "ja": "畳のへりの外に置いて、じっくり見るのだ。形、釉薬、高台。これを拝見っていうのだ。",
+      "en": "Set it down outside the edge of your mat and take a good look: the shape, the glaze, the foot. This is called haiken.",
+      "yomi": "たたみのへりのそとにおいて、じっくりみるのだ。かたち、ゆうやく、こうだい。これを、はいけんっていうのだ。"
+    },
+    {
+      "ja": "返すときは、正面を亭主に向けて「ごちそうさまでした」って言うのだ。お茶のお礼なのだ。",
+      "en": "When you hand the bowl back, turn its front to the host and say 'Gochisōsama deshita': thank you for the tea.",
+      "yomi": "かえすときは、しょうめんを、ていしゅにむけて、ごちそうさまでした、っていうのだ。おちゃのおれいなのだ。"
+    },
+    {
+      "ja": "これでお点前はおしまいなのだ。静江先生のお客さんになってくれて、ありがとうなのだ！……ボクはこれから、ずんだ餅でお祝いするのだ。",
+      "en": "And that's the end of the ceremony. Thanks for being Shizue-sensei's guest! …Right, I'm off to celebrate with zunda mochi!",
+      "yomi": "これで、おてまえはおしまいなのだ。しずえせんせいの、おきゃくさんになってくれて、ありがとうなのだ。ぼくはこれから、ずんだもちで、おいわいするのだ。"
+    }
+  ],
+  "whiskDone": {
+    "ja": "すごいのだ！じゃあ今度は、お客さんとして茶碗を受け取るのだ。「Drink」を押して、順番にやるのだ。",
+    "en": "Brilliant! Now receive the bowl as a guest: press Drink and follow the steps.",
+    "yomi": "すごいのだ。じゃあこんどは、おきゃくさんとして、ちゃわんをうけとるのだ。どりんくをおして、じゅんばんにやるのだ。"
+  },
+  "greeting": {
+    "ja": "ボク、ずんだもんなのだ！静江先生のお茶、いっしょに見るのだ！",
+    "en": "I'm Zundamon! Let's watch Shizue-sensei make tea together!",
+    "yomi": "ぼく、ずんだもんなのだ。しずえせんせいのおちゃ、いっしょにみるのだ。"
+  },
+  "card": {
+    "role": {
+      "ja": "お茶会ナビゲーター",
+      "en": "Tea-room navigator"
+    },
+    "personality": {
+      "ja": "ずんだ餅の妖精。一人称は「ボク」、語尾は「〜なのだ」。元気で好奇心いっぱい、ちょっぴり生意気。ずんだ餅が大好き。静江先生のお点前を、わくわくしながら解説してくれる。",
+      "en": "A zunda-mochi fairy: says 'boku' and ends every sentence with '~nanoda'. Eager, curious and a little cheeky, and mad about zunda mochi. Zundamon talks you through Shizue-sensei's ceremony, buzzing with excitement."
+    },
+    "traits": [
+      {
+        "ja": "「〜なのだ」口調",
+        "en": "'~nanoda' speech"
+      },
+      {
+        "ja": "元気いっぱい",
+        "en": "Full of beans"
+      },
+      {
+        "ja": "ちょっぴり生意気",
+        "en": "A bit cheeky"
+      },
+      {
+        "ja": "ずんだ餅が大好き",
+        "en": "Loves zunda mochi"
+      }
+    ]
+  }
+}

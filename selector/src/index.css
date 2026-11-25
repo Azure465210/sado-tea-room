@@ -1,0 +1,717 @@
+/* Instructor selector styles. Tailwind runs without preflight and every utility is scoped to #sado-selector
+   (tailwind.config.cjs); the hand-written rules below are scoped the same way, so nothing here can restyle the tea room.
+   The navigator window (.sado-nav) is mounted outside #sado-selector and has its own self-contained rules. */
+@tailwind components;
+@tailwind utilities;
+
+/* ---------- root + local reset (no preflight) ---------- */
+#sado-selector .ss-root {
+  --ink: #f1eadc;
+  --muted: #a9a293;
+  --panel: #1c2225;
+  --panel-2: #252c30;
+  --line: rgba(255, 255, 255, 0.1);
+  --slant: 26px;
+  --band-angle: -7.4deg;
+  --jp-serif: 'Hiragino Mincho ProN', 'Yu Mincho', 'YuMincho', 'Noto Serif JP', 'MS PMincho', serif;
+  position: relative;
+  isolation: isolate;
+  z-index: 0;
+  box-sizing: border-box;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 18px 24px 24px;
+  color: var(--ink);
+  font-family: system-ui, -apple-system, 'Segoe UI', 'Hiragino Kaku Gothic ProN', 'Yu Gothic UI', 'Noto Sans JP', sans-serif;
+  font-size: 14px;
+  line-height: 1.45;
+  text-align: left;
+  overflow-wrap: break-word;
+}
+#sado-selector .ss-root *,
+#sado-selector .ss-root *::before,
+#sado-selector .ss-root *::after {
+  box-sizing: border-box;
+}
+/* :where() keeps the reset at the specificity of the #sado-selector id alone, so component rules below win */
+#sado-selector :where(.ss-root p, .ss-root h2, .ss-root h3, .ss-root ul, .ss-root blockquote) {
+  margin: 0;
+  padding: 0;
+}
+#sado-selector :where(.ss-root button, .ss-demo-bar button) {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  margin: 0;
+  padding: 0;
+  cursor: pointer;
+  text-transform: none;
+  letter-spacing: normal;
+  box-shadow: none;
+  min-width: 0;
+  width: auto;
+  height: auto;
+}
+#sado-selector .ss-root [lang='ja'] {
+  letter-spacing: 0.02em;
+}
+#sado-selector .ss-ja {
+  display: block;
+  color: var(--muted);
+  font-size: 0.86em;
+}
+
+/* ---------- header ---------- */
+#sado-selector .ss-header {
+  position: relative;
+  z-index: 2;
+  margin-bottom: 12px;
+}
+#sado-selector .ss-kicker {
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: #d9b27c;
+}
+#sado-selector .ss-title {
+  display: inline-block;
+  margin: 2px 0 4px;
+  font-size: clamp(24px, 3.4vw, 36px);
+  font-weight: 900;
+  font-style: italic;
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+  transform: skewX(-8deg);
+  transform-origin: left bottom;
+  background: linear-gradient(transparent 70%, rgba(217, 178, 124, 0.35) 70%, rgba(217, 178, 124, 0.35) 92%, transparent 92%);
+  padding-right: 10px;
+}
+#sado-selector .ss-sub {
+  max-width: 68ch;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+/* ---------- layout ---------- */
+#sado-selector .ss-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  gap: 20px;
+  align-items: start;
+}
+#sado-selector .ss-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px 4px;
+}
+
+/* ---------- card ---------- */
+/* the card element itself must not create a stacking context (no transform / filter / opacity / clip-path / containment):
+   its background (z 0) sits below the shared canvas (z 1) and its name band (z 2) above it */
+#sado-selector .ss-card {
+  position: relative;
+  height: 214px;
+  cursor: pointer;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+#sado-selector .ss-card-ring,
+#sado-selector .ss-card-bg,
+#sado-selector .ss-card-fg,
+#sado-selector .ss-card-accent {
+  position: absolute;
+  clip-path: polygon(var(--slant) 0, 100% 0, calc(100% - var(--slant)) 100%, 0 100%);
+}
+#sado-selector .ss-card-ring {
+  inset: -3px -4px;
+  z-index: 0;
+  background: transparent;
+  transition: background-color 0.2s;
+}
+#sado-selector .ss-card.is-selected .ss-card-ring {
+  background: var(--accent);
+}
+#sado-selector .ss-card:focus-visible .ss-card-ring {
+  background: #ffffff;
+}
+#sado-selector .ss-card-bg {
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  background: linear-gradient(165deg, #2a3236 0%, #171b1d 62%, #121517 100%);
+  filter: brightness(0.45) saturate(0.75);
+  transition: filter 0.35s ease;
+}
+#sado-selector .ss-card:hover .ss-card-bg,
+#sado-selector .ss-card:focus-visible .ss-card-bg {
+  filter: brightness(0.62) saturate(0.85);
+}
+#sado-selector .ss-card.is-selected .ss-card-bg {
+  filter: none;
+}
+#sado-selector .ss-card-glow {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 70% 60% at 52% 38%, var(--accent), transparent 72%);
+  opacity: 0.42;
+}
+#sado-selector .ss-card-stripes {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(-62deg, transparent 0 14px, rgba(255, 255, 255, 0.035) 14px 15px);
+}
+#sado-selector .ss-card-view {
+  position: absolute;
+  left: 7%;
+  right: 7%;
+  top: 14px;
+  bottom: 22%;
+  z-index: 1;
+  pointer-events: none;
+}
+#sado-selector .ss-card-view-2d {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  filter: brightness(0.5);
+}
+#sado-selector .ss-card.is-selected .ss-card-view-2d {
+  filter: none;
+}
+#sado-selector .ss-card-fg {
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  container-type: inline-size;
+}
+#sado-selector .ss-card-top {
+  position: absolute;
+  top: 8px;
+  left: calc(var(--slant) + 2px);
+  right: 8px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 4px;
+}
+#sado-selector .ss-card-band {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 37%;
+}
+#sado-selector .ss-card-slash {
+  position: absolute;
+  inset: 0;
+  clip-path: polygon(0 34%, 100% 0, 100% 100%, 0 100%);
+  background: linear-gradient(180deg, rgba(14, 17, 18, 0.9), rgba(10, 12, 13, 0.97));
+  border-top: 0;
+}
+#sado-selector .ss-card-slash::before {
+  /* thin accent line on the slash */
+  content: '';
+  position: absolute;
+  inset: 0;
+  clip-path: polygon(0 34%, 100% 0, 100% 3px, 0 calc(34% + 3px));
+  background: var(--accent);
+  opacity: 0.55;
+}
+#sado-selector .ss-card.is-selected .ss-card-slash {
+  background: repeating-linear-gradient(-62deg, transparent 0 9px, rgba(0, 0, 0, 0.08) 9px 11px), var(--accent);
+}
+#sado-selector .ss-card-names {
+  position: absolute;
+  left: 10px;
+  right: 6px;
+  bottom: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  transform: rotate(var(--band-angle)) skewX(-8deg);
+  transform-origin: left bottom;
+  color: var(--ink);
+}
+#sado-selector .ss-card.is-selected .ss-card-names {
+  /* clear of the 7px accent bar on the slanted left edge */
+  left: 17px;
+  color: #121416;
+}
+/* the small name's top can reach above the coloured slash onto the dark viewport: a light halo keeps it readable */
+#sado-selector .ss-card.is-selected .ss-name-small {
+  opacity: 1;
+  text-shadow: 0 0 2px rgba(255, 255, 255, 0.85), 0 0 4px rgba(255, 255, 255, 0.5);
+}
+#sado-selector .ss-name-small {
+  font-size: 9.5px;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  opacity: 0.85;
+  line-height: 1.1;
+}
+#sado-selector .ss-name-big {
+  font-size: clamp(14px, 11cqw, 23px);
+  font-weight: 900;
+  font-style: italic;
+  text-transform: uppercase;
+  letter-spacing: -0.01em;
+  line-height: 0.98;
+  white-space: nowrap;
+}
+#sado-selector .ss-name-big.is-long {
+  font-size: clamp(11px, 7.2cqw, 17px);
+}
+#sado-selector .ss-name-ja {
+  margin-top: 2px;
+  font-family: var(--jp-serif);
+  font-size: 11.5px;
+  font-weight: 600;
+  line-height: 1.1;
+  opacity: 0.92;
+}
+#sado-selector .ss-engine {
+  position: absolute;
+  right: calc(var(--slant) * 0.55 + 6px);
+  top: 0;
+  padding: 1px 6px;
+  transform: rotate(var(--band-angle)) translateY(-2px);
+  transform-origin: right bottom;
+  background: #0f1213;
+  border: 1px solid var(--accent);
+  color: var(--ink);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+}
+#sado-selector .ss-card-accent {
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  background: var(--accent);
+  clip-path: polygon(var(--slant) 0, calc(var(--slant) + 7px) 0, 7px 100%, 0 100%);
+}
+#sado-selector .ss-card-talk {
+  position: absolute;
+  z-index: 3;
+  right: 12px;
+  top: 34px;
+  display: flex;
+  gap: 2px;
+  align-items: flex-end;
+  height: 14px;
+}
+#sado-selector .ss-card-talk i,
+.sado-nav .sado-nav-wave i {
+  display: block;
+  width: 3px;
+  height: 100%;
+  background: var(--accent);
+  animation: ss-wave 0.8s ease-in-out infinite;
+}
+#sado-selector .ss-card-talk i:nth-child(2),
+.sado-nav .sado-nav-wave i:nth-child(2) {
+  animation-delay: -0.25s;
+}
+#sado-selector .ss-card-talk i:nth-child(3),
+.sado-nav .sado-nav-wave i:nth-child(3) {
+  animation-delay: -0.5s;
+}
+@keyframes ss-wave {
+  0%,
+  100% {
+    transform: scaleY(0.3);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+
+/* chips and badges */
+#sado-selector .ss-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 7px;
+  transform: skewX(-12deg);
+  background: rgba(8, 10, 11, 0.62);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: var(--ink);
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+#sado-selector .ss-chip-original {
+  background: #d9b27c;
+  border-color: #d9b27c;
+  color: #1a1612;
+}
+#sado-selector .ss-chip-solid {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #121416;
+}
+#sado-selector .ss-fallback2d {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+#sado-selector .ss-emblem,
+.sado-nav .ss-emblem {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Hiragino Mincho ProN', 'Yu Mincho', 'Noto Serif JP', serif;
+  font-size: 72px;
+  font-weight: 700;
+  color: var(--accent);
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.6);
+}
+
+/* ---------- detail panel ---------- */
+#sado-selector .ss-detail {
+  position: sticky;
+  top: 12px;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px 18px 18px;
+  background: var(--panel);
+  border-left: 4px solid var(--accent);
+  clip-path: polygon(0 0, calc(100% - 22px) 0, 100% 22px, 100% 100%, 0 100%);
+}
+#sado-selector .ss-detail-head {
+  position: relative;
+}
+#sado-selector .ss-detail-slash {
+  position: absolute;
+  left: -18px;
+  right: -18px;
+  top: -16px;
+  height: 58px;
+  background: linear-gradient(100deg, var(--accent), transparent 85%);
+  opacity: 0.28;
+  clip-path: polygon(0 0, 100% 0, 100% 40%, 0 100%);
+}
+#sado-selector .ss-detail-name {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  font-size: 25px;
+  font-weight: 900;
+  font-style: italic;
+  line-height: 1.05;
+  transform: rotate(-3deg) skewX(-8deg);
+  transform-origin: left center;
+  text-transform: uppercase;
+}
+#sado-selector .ss-detail-ja {
+  margin-top: 3px;
+  font-family: var(--jp-serif);
+  font-size: 15px;
+  font-style: normal;
+  font-weight: 600;
+  text-transform: none;
+  color: var(--accent);
+}
+#sado-selector .ss-detail-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px 6px;
+  margin-top: 10px;
+  padding-left: 3px;
+}
+#sado-selector .ss-detail-role {
+  font-weight: 700;
+  font-size: 14px;
+}
+#sado-selector .ss-detail-text {
+  font-size: 13px;
+  color: #ddd5c6;
+}
+#sado-selector .ss-detail-text.ss-ja {
+  font-size: 12px;
+  color: var(--muted);
+}
+#sado-selector .ss-traits {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  list-style: none;
+}
+#sado-selector .ss-trait {
+  padding: 3px 9px;
+  background: var(--panel-2);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--accent);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.25;
+}
+#sado-selector .ss-trait .ss-ja {
+  font-size: 10.5px;
+  font-weight: 400;
+}
+#sado-selector .ss-greeting {
+  position: relative;
+  padding: 9px 12px;
+  background: rgba(0, 0, 0, 0.25);
+  border-left: 2px solid var(--line);
+  font-size: 13px;
+  transition: border-color 0.2s;
+}
+#sado-selector .ss-greeting.is-talking {
+  border-left-color: var(--accent);
+}
+#sado-selector .ss-greeting [lang='ja'] {
+  font-family: var(--jp-serif);
+  font-size: 13.5px;
+}
+#sado-selector .ss-greeting-en {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 12px;
+  font-style: italic;
+}
+#sado-selector .ss-detail-actions {
+  display: flex;
+  gap: 8px;
+}
+#sado-selector .ss-btn {
+  display: inline-block;
+  padding: 8px 20px;
+  transform: skewX(-14deg);
+  background: var(--accent, #d9b27c);
+  color: #121416;
+  font-weight: 800;
+  font-size: 13px;
+  transition: filter 0.2s;
+}
+#sado-selector .ss-btn:hover {
+  filter: brightness(1.12);
+}
+#sado-selector .ss-btn:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 2px;
+}
+#sado-selector .ss-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+#sado-selector .ss-btn-in {
+  display: inline-block;
+  transform: skewX(14deg);
+}
+#sado-selector .ss-btn-ghost {
+  background: transparent;
+  border: 1px solid #d9b27c;
+  color: #f1eadc;
+}
+#sado-selector .ss-note {
+  font-size: 11.5px;
+  color: var(--muted);
+}
+#sado-selector .ss-detail-actions {
+  flex-wrap: wrap;
+  align-items: center;
+}
+#sado-selector .ss-btn-enter {
+  background: #d9b27c;
+}
+/* where the dossier sits under the grid, the page's own "Enter the tea room" button follows right after it */
+@media (max-width: 1080px) {
+  #sado-selector .ss-btn-enter {
+    display: none;
+  }
+}
+
+/* ---------- footer ---------- */
+#sado-selector .ss-footer {
+  position: relative;
+  z-index: 2;
+  margin-top: 18px;
+  padding-top: 10px;
+  border-top: 1px solid var(--line);
+  font-size: 11px;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+#sado-selector .ss-footer p + p {
+  margin-top: 3px;
+}
+
+/* ---------- the shared canvas ---------- */
+#sado-selector .ss-canvas {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* ---------- responsive ---------- */
+@media (max-width: 1080px) {
+  #sado-selector .ss-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  #sado-selector .ss-detail {
+    position: relative;
+    top: 0;
+  }
+}
+@media (max-width: 700px) {
+  #sado-selector .ss-root {
+    padding: 14px 16px 20px;
+    --slant: 20px;
+  }
+  #sado-selector .ss-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px 2px;
+  }
+  #sado-selector .ss-card {
+    height: 204px;
+  }
+  /* 'KOTONOHA' must not run under the engine tag on a phone-width card */
+  #sado-selector .ss-name-small {
+    font-size: 8.5px;
+    letter-spacing: 0.1em;
+  }
+  #sado-selector .ss-sub {
+    font-size: 12.5px;
+  }
+}
+/* ---------- reduced motion ---------- */
+#sado-selector .ss-root.is-still *,
+#sado-selector .ss-root.is-still *::before {
+  transition: none !important;
+  animation: none !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  #sado-selector .ss-root *,
+  .sado-nav * {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+/* ---------- demo page only ---------- */
+#sado-selector .ss-demo-bar {
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0 24px 12px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  color: #f1eadc;
+  font-family: system-ui, sans-serif;
+  font-size: 13px;
+}
+#sado-selector .ss-demo-bar .ss-btn {
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 6px 16px;
+}
+#sado-selector .ss-demo-nav {
+  max-width: 1240px;
+  margin: 0 auto 32px;
+  padding: 0 24px;
+}
+#sado-selector .ss-demo-nav .sado-nav {
+  width: 200px;
+}
+
+/* ---------- navigator window (self-contained; may live outside #sado-selector) ---------- */
+.sado-nav {
+  --nav-ink: #f1eadc;
+  position: relative;
+  width: 100%;
+  max-width: 240px;
+  box-sizing: border-box;
+  font-family: system-ui, -apple-system, 'Segoe UI', 'Hiragino Kaku Gothic ProN', 'Yu Gothic UI', sans-serif;
+  color: var(--nav-ink);
+  line-height: 1.2;
+}
+.sado-nav *,
+.sado-nav *::before,
+.sado-nav *::after {
+  box-sizing: border-box;
+}
+.sado-nav .sado-nav-frame {
+  position: relative;
+  padding: 3px;
+  background: linear-gradient(150deg, var(--accent), #2a2f33 60%);
+  clip-path: polygon(16px 0, 100% 0, 100% calc(100% - 16px), calc(100% - 16px) 100%, 0 100%, 0 16px);
+  transition: filter 0.25s;
+}
+.sado-nav.is-talking .sado-nav-frame {
+  filter: drop-shadow(0 0 6px var(--accent)) brightness(1.08);
+}
+.sado-nav .sado-nav-view {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  background: radial-gradient(ellipse 70% 60% at 50% 40%, rgba(255, 255, 255, 0.16), transparent 70%),
+    linear-gradient(170deg, #2c3438, #14181a);
+  clip-path: polygon(14px 0, 100% 0, 100% 100%, 0 100%, 0 14px);
+}
+.sado-nav .sado-nav-view canvas {
+  display: block;
+}
+.sado-nav .ss-fallback2d {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.sado-nav .sado-nav-plate {
+  position: relative;
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 2px 8px;
+  padding: 5px 34px 6px 10px;
+  background: #101315;
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 13px), calc(100% - 13px) 100%, 0 100%);
+}
+.sado-nav .sado-nav-plate::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 5px;
+  background: var(--accent);
+}
+.sado-nav .sado-nav-en {
+  font-size: 13px;
+  font-weight: 900;
+  font-style: italic;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+  transform: skewX(-8deg);
+}
+.sado-nav .sado-nav-ja {
+  font-family: 'Hiragino Mincho ProN', 'Yu Mincho', 'Noto Serif JP', serif;
+  font-size: 11px;
+  color: var(--accent);
+}
+.sado-nav .sado-nav-wave {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  display: flex;
+  gap: 2px;
+  height: 12px;
+  margin-top: -6px;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.sado-nav.is-talking .sado-nav-wave {
+  opacity: 1;
+}

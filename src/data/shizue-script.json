@@ -1,0 +1,436 @@
+{
+  "teacher": "shizue",
+  "language": "en",
+  "greeting": {
+    "en": "Welcome to my tea room. I am Shizue. Today I will make a bowl of thin tea for you, one step at a time. Please sit comfortably and watch."
+  },
+  "steps": [
+    {
+      "lines": [
+        [
+          2.5,
+          {
+            "en": "Welcome. Please sit comfortably and take a moment to settle in."
+          }
+        ],
+        [
+          5.2,
+          {
+            "en": "Today I will make a bowl of thin tea, usucha, for you."
+          }
+        ],
+        [
+          12.6,
+          {
+            "en": "First a sweet, then the tea. Press Next whenever you are ready."
+          }
+        ]
+      ],
+      "qs": [
+        [
+          {
+            "en": "Why does the host bow?"
+          },
+          {
+            "en": "A bow opens and closes every meeting in the tea room. It says: I am glad you came, and I will do my best for you."
+          }
+        ],
+        [
+          {
+            "en": "Where should I sit?"
+          },
+          {
+            "en": "In a real tea room the guests sit in a row on the host's right, directly on the tatami. Here your seat is in front of the host, so that you can see everything she does."
+          }
+        ]
+      ]
+    },
+    {
+      "lines": [
+        [
+          0.5,
+          {
+            "en": "Please have a sweet. This is a nerikiri, a soft main sweet of white bean paste, shaped for the season."
+          }
+        ],
+        [
+          8,
+          {
+            "en": "Set one on your kaishi paper. Use the kuromoji pick to cut it into bites, and finish the sweet before I serve the tea."
+          }
+        ],
+        [
+          13.5,
+          {
+            "en": "With thin tea, light dry sweets, higashi, are also common. Today it is a main sweet, so you need the pick."
+          }
+        ]
+      ],
+      "qs": [
+        [
+          {
+            "en": "Why eat the sweet first?"
+          },
+          {
+            "en": "The sweet lines the mouth with sweetness, so the slightly bitter matcha tastes round and clean. It is never eaten with the tea."
+          }
+        ],
+        [
+          {
+            "en": "What is higashi?"
+          },
+          {
+            "en": "Dry pressed sugar sweets, often shaped like flowers or leaves. They are picked up with the fingers and need no kuromoji; they usually go with thin tea."
+          }
+        ]
+      ]
+    },
+    {
+      "lines": [
+        [
+          0.4,
+          {
+            "en": "First I bring the bowl, the tea container and the whisk in front of my knees."
+          }
+        ],
+        [
+          8.5,
+          {
+            "en": "I take the fukusa from my obi, already folded diagonally into a triangle, and hold its corners."
+          }
+        ],
+        [
+          17,
+          {
+            "en": "I tuck the loose edge, fold over my left thumb, and crease the tail with my right index finger. Then I wipe the tea container, the natsume."
+          }
+        ],
+        [
+          33,
+          {
+            "en": "Then the bamboo scoop, the chashaku: three wipes along it."
+          }
+        ],
+        [
+          40,
+          {
+            "en": "They are already clean. This is to calm my mind and to show respect to you."
+          }
+        ]
+      ],
+      "qs": [
+        [
+          {
+            "en": "Is the fukusa only for cleaning?"
+          },
+          {
+            "en": "No. The utensils are clean before the ceremony. Wiping them in front of you prepares the heart, not the object."
+          }
+        ],
+        [
+          {
+            "en": "How is the fukusa folded?"
+          },
+          {
+            "en": "Start with the diagonal triangle. Raise the right corner, then regrip the middle of the edge and tuck the sail with the left fingers. Turn the left palm up, fold the opposite corners together, then use the right index to crease the tail and transfer the pad."
+          }
+        ]
+      ]
+    },
+    {
+      "lines": [
+        [
+          0.5,
+          {
+            "en": "I take the ladle, the hishaku, in my left hand and hold it upright, like a hand mirror. My right hand opens the kettle lid with the fukusa and rests it on the futaoki."
+          }
+        ],
+        [
+          11,
+          {
+            "en": "The damp linen cloth, the chakin, comes out of the bowl and waits on the lid."
+          }
+        ],
+        [
+          14,
+          {
+            "en": "Now I warm the bowl: one ladle of hot water from the kettle."
+          }
+        ],
+        [
+          25.5,
+          {
+            "en": "I rest the ladle on the kettle and check the whisk in the warm water, lifting it to look at the tines."
+          }
+        ],
+        [
+          38.5,
+          {
+            "en": "Then I pour the water into the waste bowl, the kensui, on my left."
+          }
+        ],
+        [
+          42.5,
+          {
+            "en": "And I wipe the bowl with the chakin."
+          }
+        ]
+      ],
+      "qs": [
+        [
+          {
+            "en": "Why lift the whisk?"
+          },
+          {
+            "en": "This is chasen-tōshi: the host checks that no tine is broken, and softens the bamboo in warm water so it does not snap while whisking."
+          }
+        ],
+        [
+          {
+            "en": "Why open the lid with the cloth?"
+          },
+          {
+            "en": "The iron lid is hot. The folded fukusa protects the fingers, and the lid rests on the bamboo futaoki, never on the tatami."
+          }
+        ]
+      ]
+    },
+    {
+      "lines": [
+        [
+          0.5,
+          {
+            "en": "I hold the tea container, the natsume, in my left hand and lift the lid with my right, resting it beside the bowl."
+          }
+        ],
+        [
+          7,
+          {
+            "en": "One scoop of matcha, and then half a scoop. One and a half for thin tea."
+          }
+        ],
+        [
+          16,
+          {
+            "en": "A light tap of the scoop on the rim, then the lid goes back and the natsume returns to its place."
+          }
+        ]
+      ],
+      "qs": [
+        [
+          {
+            "en": "How much matcha is that?"
+          },
+          {
+            "en": "About 2 grams: one full scoop and a half. For thick tea, koicha, the host uses about three scoops per person."
+          }
+        ],
+        [
+          {
+            "en": "Why tap the scoop?"
+          },
+          {
+            "en": "A light tap on the rim drops the last powder from the scoop into the bowl."
+          }
+        ]
+      ]
+    },
+    {
+      "lines": [
+        [
+          0.5,
+          {
+            "en": "One ladle of hot water from the kettle, but I pour only part of it into the bowl."
+          }
+        ],
+        [
+          9,
+          {
+            "en": "About sixty millilitres. Too much water makes it watery."
+          }
+        ],
+        [
+          13,
+          {
+            "en": "The rest goes back into the kettle, so nothing is wasted."
+          }
+        ]
+      ],
+      "qs": [
+        [
+          {
+            "en": "How hot is the water?"
+          },
+          {
+            "en": "Just under the boil in the kettle, about 80 °C by the time it reaches the bowl."
+          }
+        ],
+        [
+          {
+            "en": "Why return water to the kettle?"
+          },
+          {
+            "en": "The host scoops a full ladle so the movement is always the same, then returns what is not needed. Nothing is wasted."
+          }
+        ]
+      ]
+    },
+    {
+      "lines": [
+        [
+          0.5,
+          {
+            "en": "My left hand steadies the bowl. I move the whisk with my wrist in quick strokes, as if I were writing the letter M."
+          }
+        ],
+        [
+          10,
+          {
+            "en": "The foam becomes fine and smooth."
+          }
+        ],
+        [
+          15,
+          {
+            "en": "At the end I move slowly in a circle and lift the whisk from the centre."
+          }
+        ]
+      ],
+      "qs": [
+        [
+          {
+            "en": "Why so fast?"
+          },
+          {
+            "en": "Fast strokes break the powder into the water and build fine foam. Slow stirring leaves lumps."
+          }
+        ],
+        [
+          {
+            "en": "Does the foam matter?"
+          },
+          {
+            "en": "In Urasenke, yes: a smooth layer of small bubbles. Other schools prefer less foam. Both are correct."
+          }
+        ]
+      ]
+    },
+    {
+      "lines": [
+        [
+          0.5,
+          {
+            "en": "Here is your tea. I take the bowl in my right hand and rest it on my left palm."
+          }
+        ],
+        [
+          5,
+          {
+            "en": "I turn it clockwise twice, a quarter turn each time, so the front faces you."
+          }
+        ],
+        [
+          12,
+          {
+            "en": "And I place it in front of you. Before you drink, turn it clockwise as I did, so your lips do not touch the front."
+          }
+        ],
+        [
+          16.4,
+          {
+            "en": "Please enjoy your tea at your own pace. I will wait quietly while you drink."
+          }
+        ]
+      ],
+      "qs": [
+        [
+          {
+            "en": "What do I say when I receive it?"
+          },
+          {
+            "en": "Bow slightly and say \"Otemae chōdai itashimasu\": I gratefully receive your tea. In English, a simple thank you is welcome."
+          }
+        ],
+        [
+          {
+            "en": "How do I drink?"
+          },
+          {
+            "en": "Lift the bowl with your right hand, rest it on your left palm, turn it clockwise twice, and drink in about three sips. Wipe the rim with your fingers, turn the bowl back, and set it down."
+          }
+        ]
+      ]
+    },
+    {
+      "lines": [
+        [
+          0,
+          {
+            "en": "In a real gathering only the host whisks. Here you may try it, and then drink as a guest."
+          }
+        ]
+      ],
+      "qs": [
+        [
+          {
+            "en": "What am I doing right?"
+          },
+          {
+            "en": "Keep the whisk upright and move your wrist, not your arm. Quick and light is better than strong."
+          }
+        ],
+        [
+          {
+            "en": "What if the foam is uneven?"
+          },
+          {
+            "en": "Finish with one slow circle and lift the whisk from the centre of the bowl. The big bubbles disappear."
+          }
+        ]
+      ]
+    }
+  ],
+  "guestIntro": [
+    {
+      "en": "You are the guest now. First the greeting: lay your closed fan in front of your knees and bow to the host."
+    },
+    {
+      "en": "Now the sweet. Take one nerikiri from the dish onto your kaishi, cut it with the kuromoji and eat it in three bites."
+    },
+    {
+      "en": "In a real gathering only the host whisks. Here you may try it: move your pointer quickly from side to side over the bowl until the foam is smooth."
+    }
+  ],
+  "guestDrink": [
+    {
+      "en": "First, bow to the host and say: “Otemae chōdai itashimasu” – I gratefully receive your tea."
+    },
+    {
+      "en": "Pick the bowl up with your right hand, rest it on your left palm, and raise it a little in thanks."
+    },
+    {
+      "en": "Turn the bowl clockwise, two small turns, so that you do not drink from its front."
+    },
+    {
+      "en": "Drink in about three sips. On the last sip, a small slurp tells the host you have finished."
+    },
+    {
+      "en": "Wipe the rim where your lips touched with your thumb and finger, then wipe your fingers on your kaishi."
+    },
+    {
+      "en": "Turn the bowl back, so that its front faces you again."
+    },
+    {
+      "en": "Set it down outside the edge of your mat and look at it closely: the shape, the glaze, the foot. This is called haiken."
+    },
+    {
+      "en": "When you hand the bowl back, turn its front to the host and say “Gochisōsama deshita”: thank you for the tea."
+    },
+    {
+      "en": "That is the end of the ceremony. Thank you for being my guest."
+    }
+  ],
+  "whiskDone": {
+    "en": "Well done. Now receive the bowl as a guest: press Drink and follow the steps."
+  }
+}

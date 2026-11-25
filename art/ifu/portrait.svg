@@ -1,0 +1,84 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 720">
+<!-- 虚音イフ: a bust after the official design (fan-made drawing). Hat, cream fur, leather beak mask with a brass ring lens,
+     stitched neck, maroon scarf tied at the side, ragged dark cape over a mid-brown kimono. The tea-room avatar does not
+     project this picture (its mask and fur are modelled); spec.face only shapes the head. -->
+<defs>
+<linearGradient id="bgG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e6e0d2"/><stop offset="1" stop-color="#d3cab5"/></linearGradient>
+<radialGradient id="bgGlow" gradientUnits="userSpaceOnUse" cx="300" cy="300" r="340"><stop offset="0" stop-color="#f5f0e4" stop-opacity=".95"/><stop offset="1" stop-color="#f5f0e4" stop-opacity="0"/></radialGradient>
+<linearGradient id="furG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#efe5cc"/><stop offset="1" stop-color="#cbb98f"/></linearGradient>
+<linearGradient id="maskG" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7a5640"/><stop offset=".6" stop-color="#5a3c29"/><stop offset="1" stop-color="#3f2a1d"/></linearGradient>
+<linearGradient id="beakG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8a6a55"/><stop offset="1" stop-color="#5e4433"/></linearGradient>
+<linearGradient id="hatG" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#5c4332"/><stop offset=".45" stop-color="#7a5a45"/><stop offset="1" stop-color="#4f3a2b"/></linearGradient>
+<radialGradient id="lensG" cx=".4" cy=".35" r=".7"><stop offset="0" stop-color="#5a5660"/><stop offset="1" stop-color="#1f1d22"/></radialGradient>
+</defs>
+<g id="bg"><rect width="600" height="720" fill="url(#bgG)"/><rect width="600" height="720" fill="url(#bgGlow)"/></g>
+<g id="hair-back"/>
+<g id="body">
+  <!-- kimono and the pale chest in the open collar -->
+  <path d="M150 720 C160 610 200 540 262 505 L338 505 C400 540 440 610 450 720 Z" fill="#5f4234"/>
+  <path d="M268 505 L300 600 L332 505 Z" fill="#cdbb98"/>
+  <path d="M262 505 L300 612 L284 640 L238 530 Z" fill="#4a3226"/>
+  <path d="M338 505 L300 612 L316 640 L362 530 Z" fill="#553a2c"/>
+  <!-- the ragged short cape over the shoulders -->
+  <path d="M95 720 L104 676 L86 690 L102 630 C120 560 180 520 252 498 L270 520 L236 600 L246 640 L226 660 L214 720 Z" fill="#2e2019"/>
+  <path d="M505 720 L496 676 L514 690 L498 630 C480 560 420 520 348 498 L330 520 L364 600 L354 640 L374 660 L386 720 Z" fill="#33241c"/>
+  <path d="M118 650 L132 600 M150 690 L160 640 M470 650 L456 604 M440 692 L432 640" stroke="#1d140f" stroke-width="3" fill="none"/>
+  <!-- neck: fur with a stitched seam -->
+  <path d="M262 380 L338 380 L344 500 L256 500 Z" fill="url(#furG)"/>
+  <path d="M258 452 C285 460 315 460 342 452" stroke="#3a2a20" stroke-width="3" fill="none"/>
+  <path d="M266 446 l4 14 M280 448 l4 14 M294 449 l4 14 M308 449 l4 14 M322 448 l4 14 M334 446 l4 13" stroke="#3a2a20" stroke-width="2.4"/>
+  <!-- maroon scarf, tied at his left (the viewer's right) -->
+  <path d="M236 478 C260 462 340 462 366 480 C372 500 352 520 300 522 C250 522 228 502 236 478 Z" fill="#5a1a1e"/>
+  <path d="M244 486 C270 476 330 476 356 488" stroke="#3d0f12" stroke-width="3" fill="none"/>
+  <ellipse cx="366" cy="486" rx="22" ry="18" fill="#62202a"/>
+  <path d="M370 498 C380 530 392 555 400 580 L380 584 C374 556 364 530 358 502 Z" fill="#561a1f"/>
+  <path d="M362 500 C360 530 356 556 352 584 L336 578 C342 552 348 526 352 500 Z" fill="#4c1519"/>
+  <path d="M378 470 C398 462 410 470 404 484 C396 492 384 490 376 484 Z" fill="#62202a"/>
+</g>
+<g id="ears">
+  <!-- fur tufts round the head and the ear tuft -->
+  <path d="M396 232 L428 186 L420 240 Z" fill="#e3d6b8"/>
+  <path d="M410 214 L428 186 L418 222 Z" fill="#b39e75"/>
+</g>
+<g id="face-base">
+  <!-- the fur-covered head -->
+  <path d="M190 290 C186 222 236 178 306 176 C376 176 424 218 424 290 C424 330 414 360 398 384 L410 396 L388 398 L392 412 L370 404 L366 418 L350 404 L240 404 L232 418 L224 402 L206 410 L210 394 L192 392 L202 378 C194 352 190 320 190 290 Z" fill="url(#furG)"/>
+  <path d="M206 300 l-12 6 M410 300 l14 6 M404 340 l16 4 M200 344 l-12 2 M392 370 l16 10" stroke="#bba77e" stroke-width="3"/>
+  <!-- the leather mask over the face -->
+  <path d="M210 252 C240 236 330 234 372 250 C384 290 384 340 370 380 C330 396 260 396 222 384 C206 344 204 290 210 252 Z" fill="url(#maskG)"/>
+  <path d="M210 252 C240 236 330 234 372 250 C384 290 384 340 370 380 C330 396 260 396 222 384 C206 344 204 290 210 252 Z" fill="none" stroke="#2b1c13" stroke-width="4"/>
+  <path d="M290 242 L290 300" stroke="#e2d1aa" stroke-width="2.5" stroke-dasharray="6 6"/>
+</g>
+<g id="lines"/>
+<g id="brows"/>
+<g id="eyes-open">
+  <!-- the brass ring lens at the side of the mask, and the near eye glass -->
+  <circle cx="358" cy="292" r="28" fill="none" stroke="#b8923e" stroke-width="10"/>
+  <circle cx="358" cy="292" r="23" fill="url(#lensG)"/>
+  <circle cx="350" cy="282" r="6" fill="#fff6e0" opacity=".7"/>
+  <circle cx="335" cy="270" r="3" fill="#8a6c2e"/><circle cx="381" cy="314" r="3" fill="#8a6c2e"/>
+  <ellipse cx="236" cy="292" rx="14" ry="16" fill="url(#lensG)" stroke="#8f7232" stroke-width="5"/>
+</g>
+<g id="eyes-lowered" display="none"/>
+<g id="eyes-closed" display="none"/>
+<g id="nose">
+  <!-- the long curved beak, pointing down and forward -->
+  <path d="M250 300 C300 300 330 330 324 376 C316 430 270 486 214 520 C236 470 246 430 244 396 C226 380 222 330 250 300 Z" fill="url(#beakG)"/>
+  <path d="M250 300 C300 300 330 330 324 376 C316 430 270 486 214 520" fill="none" stroke="#3a2a20" stroke-width="3.5"/>
+  <path d="M262 304 C300 312 318 340 312 380 C306 420 276 464 236 500" fill="none" stroke="#e2d1aa" stroke-width="2.2" stroke-dasharray="6 7"/>
+  <path d="M244 396 C252 404 262 404 270 398" fill="none" stroke="#3a2a20" stroke-width="3"/>
+</g>
+<g id="mouth-rest"/>
+<g id="mouth-talk" display="none"/>
+<g id="hair-front">
+  <!-- the hat: brown, darker band, a dark feather and a small patch -->
+  <path d="M120 238 C150 214 230 206 304 206 C384 206 462 214 488 236 C470 254 400 262 304 262 C206 262 136 256 120 238 Z" fill="#4f3a2b"/>
+  <path d="M206 222 C204 170 212 122 232 104 C262 92 350 92 378 104 C396 126 402 170 400 222 C360 236 248 236 206 222 Z" fill="url(#hatG)"/>
+  <path d="M232 104 C262 116 350 116 378 104" fill="none" stroke="#3e2b21" stroke-width="4"/>
+  <path d="M206 196 C250 210 360 210 402 196 L400 224 C360 238 248 238 206 224 Z" fill="#2e2018"/>
+  <rect x="236" y="138" width="38" height="34" fill="#8c6c53" transform="rotate(-6 255 155)"/>
+  <path d="M238 140 l36 -4 M240 172 l36 -4" stroke="#e2d1aa" stroke-width="2" stroke-dasharray="4 4"/>
+  <path d="M392 206 C430 170 470 150 512 140 C484 166 448 194 404 214 Z" fill="#241d19"/>
+  <path d="M398 208 C440 176 476 156 506 144" fill="none" stroke="#5c5048" stroke-width="2"/>
+</g>
+</svg>

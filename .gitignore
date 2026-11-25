@@ -1,0 +1,21 @@
+# Generated builds and dependencies
+node_modules/
+dist/
+coverage/
+*.tsbuildinfo
+*.log
+
+# Local settings and credentials
+.env
+.env.*
+!.env.example
+.npmrc
+
+# Working files and reference material retained locally
+/ref/
+/shots/
+/*-preview.jpg
+/EVALUATION.md
+/NOTES.md
+.DS_Store
+Thumbs.db
