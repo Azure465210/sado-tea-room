@@ -17,15 +17,15 @@ const stage = new THREE.Group();
 stage.scale.x = MX;
 scene.add(stage);
 
-const cam = { target: new THREE.Vector3(0, 0.3, 0.4), theta: 0, phi: 1.05, r: 2.0, goal: null };
+const cam = { target: new THREE.Vector3(0, 0.3, 0.4), theta: 0, phi: 1.05, r: 2.0, goal: null, fov: null };
 let masterView = false;
 canvas.addEventListener('pointerdown',()=>{masterView=false;});
 canvas.addEventListener('wheel',()=>{masterView=false;},{passive:true});
 const PRESETS = {
   guest: { target: [0, 0.3, 0.4], theta: 0, phi: 1.05, r: 2.0 },
   close: { target: [0, 0.1, 0.42], theta: 0.4 * MX, phi: 0.95, r: 0.8 },
-  folding: { target: [0, 0.34, 0.20], theta: 0.32 * MX, phi: 1.35, r: 0.92 },
-  master: { target: [0, 0.36, 0.23], theta: Math.PI, phi: 0.61, r: 0.57 },
+  folding: { target: [-0.02, 0.47, 0.17], theta: -0.75 * MX, phi: 1.1, r: 0.98 }, // her front-right: the flap side of the hanging cloth, the top of the pad
+  master: { target: [0, 0.375, 0.205], theta: Math.PI, phi: 0.582, r: 0.541, fov: 60 }, // her own eyes, looking down at her hands
   top: { target: [0, 0.1, 0.3], theta: 0, phi: 0.25, r: 1.8 },
 };
 const camLook = new THREE.Vector3();
@@ -44,6 +44,8 @@ function goCam(name) {
   masterView = name === 'master';
   const p = name === 'close' && step === 2 ? PRESETS.folding : PRESETS[name];
   cam.goal = { target: new THREE.Vector3(...p.target), theta: p.theta, phi: p.phi, r: p.r };
+  cam.fov = p.fov || null; // a preset may ask for its own lens
+  resize();
   for (const id of ['camGuest', 'camClose', 'camTop', 'camMaster'])
     document.getElementById(id).setAttribute('aria-pressed', String(id === 'cam' + name[0].toUpperCase() + name.slice(1)));
 }
@@ -52,7 +54,7 @@ function resize() {
     h = canvas.clientHeight;
   renderer.setSize(w, h, false);
   camera.aspect = w / h;
-  camera.fov = w / h < 0.8 ? 60 : 50; // a wider lens on an upright phone, so the utensils beside her stay in the picture
+  camera.fov = cam.fov || (w / h < 0.8 ? 60 : 50); // a wider lens on an upright phone, so the utensils beside her stay in the picture
   camera.updateProjectionMatrix();
   document.documentElement.style.setProperty('--top-h', document.getElementById('top').offsetHeight + 'px'); // panels hang below the header
 }

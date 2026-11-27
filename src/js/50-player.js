@@ -449,6 +449,7 @@ function applyTeacher() {
     O.fukusa.material = O.fukusa.material.clone(); // the silk is shared with the flower in the alcove
     O.fukusa.userData.teacherMat = true;
   }
+  if (!O.fukusa.material.onBeforeCompile || !/fukusa/.test(String(O.fukusa.material.customProgramCacheKey && O.fukusa.material.customProgramCacheKey()))) fukusaPatchMaterial(O.fukusa.material); // a clone drops the two-sided patch
   O.fukusa.material.color.set(TEACHER.fukusa); // raw hex, like every material here (shizue's stays exactly as it was)
   const tb = document.getElementById('teacherBtn'); // the bare short name so the header stays on one row at 1280px
   const words = TEACHER.name.replace(/-sensei$/, '').split(' '),

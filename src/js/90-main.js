@@ -16,7 +16,7 @@ function keyTimes(s) {
   return (s._kt = [...set].filter((x) => x >= 0 && x <= s.dur).sort((a, b) => a - b));
 }
 function poseTime(s, time) {
-  if (s === STEPS[2] && time >= 9.1 && time <= 29) return time;
+  if (s === STEPS[2] && ((time >= 9.1 && time <= 29.4) || (time >= 33.2 && time <= 39.5))) return time; // the folding runs in real time
   if (motion !== 'pictures' || s.interactive) return time;
   const K = keyTimes(s);
   let i = 0;
@@ -180,6 +180,9 @@ window.__sado = {
   rig: RIG,
   O,
   STEPS,
+  fukusaPlan: fukusaToolPlan, // the fukusa hands' current plans (contact checks)
+  fukusaPerf: fukusaToolPerf, // milliseconds spent in the fukusa update and settle
+  fukusaTarget: () => fukusaTarget, // the cloth's exact target (mesh-local), before the settle
   // skeleton numbers for the current frame: bone lengths, how far each hand is from where it should be, how deep an arm cuts into the body
   body: () => {
     const S = RIG.S,

@@ -282,7 +282,7 @@ const KENSUI = [-0.4, 0, 0.05]; // waste-water bowl, beside her left knee
   const f = mesh(fg, M.silk, {
     name: 'Fukusa',
     jp: '帛紗',
-    desc: 'A silk cloth for purifying the utensils, shown here at 27 × 30 cm. It is folded on the diagonal and tucked into the left side of the obi, then shaped into a layered pad for wiping.',
+    desc: 'A silk cloth for purifying the utensils, shown here at 27 × 30 cm. It is worn at the left hip folded as a triangle, then shaped into a small square pad for wiping.',
   });
   O.fukusa = f;
   stage.add(f);

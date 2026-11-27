@@ -95,7 +95,7 @@ function renderPose(s, card) {
 }
 function seekTo(stepIndex, time) {
   if (step !== stepIndex) loadStep(stepIndex);
-  if (stepIndex === 2 && time >= 9.5 && time <= 29) goCam('close');
+  if (stepIndex === 2 && ((time >= 9.5 && time <= 29) || (time >= 33.6 && time <= 39.1))) goCam('close');
   const s = STEPS[step];
   t = Math.max(0, Math.min(s.dur, time));
   lineIdx = s.lines.filter((l) => l[0] <= t).length;

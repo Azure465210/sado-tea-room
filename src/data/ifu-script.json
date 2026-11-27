@@ -118,33 +118,57 @@
         [
           8.5,
           {
-            "ja": "帛紗は斜めに折った三角形から始めます。角を持ち、右肘を上げます。",
-            "en": "Start with the fukusa already folded diagonally into a triangle. Hold the corners and raise the right elbow.",
-            "yomi": "ふくさはななめにおったさんかくけいからはじめます。かどをもち、みぎひじをあげます。"
+            "ja": "左手で帯から帛紗を抜き、右手で向こうの角をつまみ、対角が真っ直ぐ立つまで上げます。",
+            "en": "My left hand draws the fukusa from the obi; my right pinches the far corner and lifts until the diagonal stands straight.",
+            "yomi": "ひだりてで、おびからふくさをぬき、みぎてでむこうのかどをつまみ、たいかくがまっすぐたつまであげます。"
           }
         ],
         [
-          17,
+          16.4,
           {
-            "ja": "端を折り込み、左の親指を軸に半分に畳み、右の人差し指で折り目をつけます。この帛紗で棗を清めます。",
-            "en": "Tuck the loose edge, fold over the left thumb, and crease the tail with the right index finger. The folded pad is ready for the natsume.",
-            "yomi": "はしをおりこみ、ひだりのおやゆびをじくにはんぶんにたたみ、みぎのひとさしゆびでおりめをつけます。このふくさでなつめをきよめます。"
+            "ja": "垂れた端を折り込み、親指を真ん中に当て、手のひらを上へ。",
+            "en": "I fold in the hanging end, set my thumb on the centre, and turn the palm up.",
+            "yomi": "たれたはしをおりこみ、おやゆびをまんなかにあて、てのひらをうえへ。"
           }
         ],
         [
-          33,
+          21.4,
           {
-            "ja": "お次は竹の茶杓。すうっと三度、拭って参ります。",
-            "en": "Next, the bamboo scoop, the chashaku: three wipes along it.",
-            "yomi": "おつぎはたけのちゃしゃく。すうっとさんど、ぬぐってまいります。"
+            "ja": "親指を芯に半分に畳み、人差し指で一の字を引いて、端をつの字に巻き込みます。",
+            "en": "I fold it in half around my thumb, draw the stroke 一 with my index finger, and curl the end under like つ.",
+            "yomi": "おやゆびをしんにはんぶんにたたみ、ひとさしゆびでいちのじをひいて、はしをつのじにまきこみます。"
           }
         ],
         [
-          40,
+          28.7,
           {
-            "ja": "どれも、もとより清らかで御座います。拭うのは、あたくしの心を静め、あんた様への敬いを表すためで。",
-            "en": "They are quite clean already. I wipe them to calm my own mind, and to show my respect for you.",
-            "yomi": "どれも、もとよりきよらかでございます。ぬぐうのは、あたくしのこころをしずめ、あんたさまへのうやまいをあらわすためで。"
+            "ja": "お次は棗。左手に持ち、蓋を「こ」の字に拭います。",
+            "en": "Next, the natsume. I hold it in my left hand and wipe the lid in the shape of こ.",
+            "yomi": "おつぎはなつめ。ひだりてにもち、ふたを「こ」のじにぬぐいます。"
+          }
+        ],
+        [
+          33.4,
+          {
+            "ja": "帛紗をもう一度捌き直し、左の手のひらに載せるので御座います。",
+            "en": "I fold the fukusa once more and rest it on my left palm.",
+            "yomi": "ふくさをもういちどさばきなおし、ひだりのてのひらにのせるのでございます。"
+          }
+        ],
+        [
+          39.1,
+          {
+            "ja": "続いて茶杓を、三度拭って参ります。",
+            "en": "Then the bamboo scoop, the chashaku: three wipes.",
+            "yomi": "つづいてちゃしゃくを、さんどぬぐってまいります。"
+          }
+        ],
+        [
+          42.6,
+          {
+            "ja": "もとより清らかで御座います。拭うのは、心を静め、あんた様を敬うためで。",
+            "en": "They are clean to begin with. I wipe them to calm my heart and to honour you.",
+            "yomi": "もとよりきよらかでございます。ぬぐうのは、こころをしずめ、あんたさまをうやまうためで。"
           }
         ]
       ],
@@ -166,9 +190,9 @@
             "en": "How is the fukusa folded?"
           },
           {
-            "ja": "三角形の右角を上げ、左手で辺の中央を持ち直して端を折り込みます。左の手のひらを上に向け、親指を軸に半分に畳んだあと、右の人差し指で折り目をつけて右手で受け取ります。",
-            "en": "Start with the diagonal triangle. Raise the right corner and regrip the middle of the edge with the left hand to tuck the loose silk. Turn the left palm up, fold over the thumb, and use the right index to crease and tuck the tail before taking it in the right hand.",
-            "yomi": "さんかくけいのみぎかどをあげ、ひだりてでへんのちゅうおうをもちなおしてはしをおりこみます。ひだりのてのひらをうえにむけ、おやゆびをじくにはんぶんにたたんだあと、みぎのひとさしゆびでおりめをつけてみぎてでうけとります。"
+            "ja": "左手で手前左の角を、右手で向こう右の角の少し内側を持ち、対角を真っ直ぐ立てて三角に垂らします。垂れた端を左の指で折り込み、親指を真ん中に当てて手のひらを上へ。親指を芯に向こうの角を手前の角へ重ね、人差し指で一の字を引き、端をつの字に巻き込めば、四つ折りの出来上がりで御座います。",
+            "en": "The left hand holds the near-left corner and the right hand pinches just inside the far-right corner; the diagonal is raised straight up so the cloth hangs as a triangle. The left fingers fold in the hanging end, the thumb goes to the centre and the palm turns up. Over the thumb the far corner comes down onto the near corner; the index finger draws the stroke 一 and curls the end under like つ, and there is the four-layer pad.",
+            "yomi": "ひだりてで、てまえひだりのかどを、みぎてで、むこうみぎのかどのすこしうちがわをもち、たいかくをまっすぐたてて、さんかくにたらします。たれたはしを、ひだりのゆびでおりこみ、おやゆびをまんなかにあてて、てのひらをうえへ。おやゆびをしんに、むこうのかどをてまえのかどへかさね、ひとさしゆびでいちのじをひき、はしをつのじにまきこめば、よつおりのできあがりでございます。"
           }
         ]
       ]

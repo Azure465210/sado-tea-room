@@ -19,6 +19,14 @@ const BODY = {
   headPivot: [0, 0.578, -0.008], // where the skull sits on the spine
   headCentre: 0.078, // head centre above the pivot; the head is 20.5 cm tall
   hipSeiza: 0.21, // height of the hip joints when sitting on the heels
+  // [across the palm (+ = thumb side), knuckle set-back, first bone, second bone, radius]: index, middle, ring, little
+  fingers: [
+    [0.0275, 0.003, 0.04, 0.033, 0.0078],
+    [0.0092, 0, 0.043, 0.035, 0.008],
+    [-0.0092, 0.003, 0.04, 0.033, 0.0076],
+    [-0.0275, 0.011, 0.032, 0.027, 0.0068],
+  ],
+  thumb: [0.042, 0.032, 0.0072], // two bones and the tip radius
 };
 const RIG = (function () {
   const V = (x, y, z) => new THREE.Vector3(x, y, z);
@@ -66,6 +74,9 @@ const RIG = (function () {
       clear: 0.028,
       pen: 0,
       clamp: 0,
+      cw: 0, // weight of a planned contact (cLocal: the contact in the hand's frame (X, up, fwd); cGoal: where it must go)
+      cLocal: V(),
+      cGoal: V(),
     };
     S.legsOut[side] = { hip: V(), knee: V(), ankle: V(), toe: V() };
   }
@@ -269,23 +280,31 @@ const RIG = (function () {
       cz = C.z;
     let best = 1e9,
       bestS = 0;
-    for (let k = 0; k < (arm.level ? 65 : 31); k++) {
+    const wide = arm.level || arm.dirCost;
+    for (let k = 0; k < (wide ? 65 : 31); k++) {
       // candidates: 0, then alternating outward / inward steps
       const sw = k === 0 ? 0 : (k % 2 ? 1 : -0.5) * Math.ceil(k / 2) * 0.1;
-      if (sw < -0.6 || sw > (arm.level ? 3.2 : 1.5)) continue;
+      if (sw < -0.6 || sw > (wide ? 3.2 : 1.5)) continue;
       const cs = Math.cos(sw),
         sn = Math.sin(sw);
       Etry.set(cx + h * (cs * ux + sn * vx), cy + h * (cs * uy + sn * vy), cz + h * (cs * uz + sn * vz));
       const pen = armPenalty(arm, Etry);
       const levelCost = arm.level ? Math.pow(Etry.y-arm.wrist.y,2)*350*arm.level : 0;
-      const cost = pen * 60 + sw * sw * 0.35 + levelCost + Math.abs(sw - arm.swivel) * (dt > 0 ? 0.25 : 0);
+      // a hand that must point a given way (it is handling cloth) needs an elbow from which the wrist can bend there
+      let bendCost = 0;
+      if (arm.dirCost) {
+        t4.subVectors(arm.wrist, Etry).normalize();
+        const over = 0.5 - t4.dot(arm.fwdT);
+        if (over > 0) bendCost = over * over * 3 * arm.dirCost;
+      }
+      const cost = pen * 60 + sw * sw * 0.35 + levelCost + bendCost + Math.abs(sw - arm.swivel) * (dt > 0 ? 0.25 : 0);
       if (cost < best) {
         best = cost;
         bestS = sw;
         Ebest.copy(Etry);
         arm.pen = pen;
       }
-      if (k === 0 && pen < 1e-4 && !arm.level) break; // the natural pose is free: take it
+      if (k === 0 && pen < 1e-4 && !arm.level && bendCost === 0) break; // the natural pose is free: take it
     }
     arm.swivel = dt > 0 ? lerp(arm.swivel, bestS, 1 - Math.exp(-dt * 10)) : bestS;
     const cs = Math.cos(arm.swivel),
@@ -322,6 +341,69 @@ const RIG = (function () {
     nT = V(),
     a3 = V(),
     aw = {};
+  const fbX = V(),
+    fbQ0 = new THREE.Quaternion(),
+    fbQ1 = new THREE.Quaternion(),
+    fbM = new THREE.Matrix4();
+  function frameQ(f, n, q) {
+    // orthonormal hand frame (X = n × f, n, f) as a quaternion; f and n are normalised in place
+    f.normalize();
+    n.addScaledVector(f, -n.dot(f));
+    if (n.lengthSq() < 1e-8) n.set(0, 1, 0).addScaledVector(f, -f.y);
+    if (n.lengthSq() < 1e-8) n.set(1, 0, 0).addScaledVector(f, -f.x);
+    n.normalize();
+    fbX.crossVectors(n, f);
+    return q.setFromRotationMatrix(fbM.makeBasis(fbX, n, f));
+  }
+  const fbF = V(),
+    fbN = V();
+  function frameBlend(f, n, f1, n1, w) {
+    // turn the hand frame (f, n) toward (f1, n1) by w along the shortest rotation
+    frameQ(f, n, fbQ0);
+    frameQ(fbF.copy(f1), fbN.copy(n1), fbQ1);
+    if (w < 1) fbQ0.slerp(fbQ1, w);
+    else fbQ0.copy(fbQ1);
+    f.set(0, 0, 1).applyQuaternion(fbQ0);
+    n.set(0, 1, 0).applyQuaternion(fbQ0);
+  }
+  // the hand pose a grip mode gives (f, n, and [gd, curl, thumb] in mf), for a grip point G whose horizontal direction from the
+  // shoulder is a3
+  const mfF = V(),
+    mfN = V(),
+    mf = [0, 0, 0];
+  function modeFrame(side, G, mode, aim, f, n) {
+    if (mode === 'up') {
+      f.copy(a3).add(t2.set(-side * 0.25, -0.05, 0.1));
+      n.set(0, -1, 0);
+      mf[0] = 0.085;
+      mf[1] = 0.3;
+      mf[2] = 0.15;
+    } else if (mode === 'in') {
+      f.copy(a3).add(t2.set(-side * 0.1, -0.25, 0.1));
+      n.set(side, 0.3, 0);
+      mf[0] = 0.072;
+      mf[1] = 0.8;
+      mf[2] = 0.8;
+    } else if (mode === 'pinch') {
+      f.copy(a3).multiplyScalar(0.5).add(t2.set(-side * 0.08, -0.85, 0));
+      n.copy(a3).add(t2.set(0, 0.35, 0));
+      mf[0] = 0.125;
+      mf[1] = 0.42;
+      mf[2] = 0.75;
+    } else {
+      f.copy(a3).add(t2.set(-side * 0.15, -0.38, 0));
+      n.set(0, 1, 0);
+      mf[0] = 0.08;
+      mf[1] = 0.18;
+      mf[2] = 0.25;
+    }
+    if (aim) {
+      t2.subVectors(aim, G);
+      if (t2.lengthSq() > 1e-4) f.copy(t2);
+    }
+    f.normalize();
+    n.normalize();
+  }
   function handIntent(arm, I) {
     // desired hand direction (fT), back-of-hand normal (nT), grip distance, finger pose: from the mode, blended toward anchors
     const side = arm.side,
@@ -371,8 +453,53 @@ const RIG = (function () {
     if (I.handForward) fT.copy(I.handForward);
     arm.level = I.level || 0;
     arm.fingers = I.fingers || null;
+    arm.pinch = I.pinch == null ? null : I.pinch; // thumb closes onto the index pad, leaving this gap (m)
+    arm.pinchW = 1;
+    arm.pinchLat = false;
+    arm.dirCost = !!I.handForward; // the hand's direction is prescribed: choose the elbow so the wrist can bend there
+    arm.dirSnap = 0;
+    arm.cw = 0;
     fT.normalize();
     nT.normalize();
+    if (I.modeBW > 0) {
+      // a hold easing in or out (or one hold handing over to the next): the hand turns gradually between the two poses
+      modeFrame(side, G, I.modeB, I.aimB, mfF, mfN);
+      const w = I.modeBW;
+      frameBlend(fT, nT, mfF, mfN, w);
+      gd = lerp(gd, I.gdB != null ? I.gdB : mf[0], w);
+      curl = lerp(curl, I.curlB != null ? I.curlB : mf[1], w);
+      thumb = lerp(thumb, I.thumbB != null ? I.thumbB : mf[2], w);
+    }
+    const K = I.fk;
+    if (K && K.w > 0) {
+      // a planned hand (the fukusa): blend from the pose the mode above gives to the planned one, so that taking over and
+      // handing back are continuous; while it is fully planned the hand follows the plan without lag (seek = play)
+      const w = K.w;
+      frameBlend(fT, nT, K.F, K.N, w);
+      gd = lerp(gd, K.gd, w);
+      thumb = lerp(thumb, K.thumb, w);
+      const fo = arm.fingersBuf || (arm.fingersBuf = [0, 0, 0, 0]);
+      let cs = 0;
+      for (let i = 0; i < 4; i++) {
+        fo[i] = lerp(arm.fingers ? arm.fingers[i] : curl, K.fingers[i], w);
+        cs += fo[i];
+      }
+      arm.fingers = fo;
+      curl = cs / 4;
+      arm.pinch = K.pinch == null ? null : K.pinch;
+      arm.pinchW = K.pinch == null ? 0 : w * (K.pinchW == null ? 1 : K.pinchW);
+      arm.pinchLat = !!K.lat;
+      arm.level = K.level || 0;
+      arm.dirCost = w;
+      arm.dirSnap = w;
+      if (K.cLocal) {
+        // the contact (a fingertip, the pinch, the clamp) must land on its goal even where the wrist cannot turn the hand
+        // as far as planned: solve() moves the wrist after the hand has been turned (see contactFix)
+        arm.cw = sm((w - 0.5) / 0.5); // only once the plan leads the hand (while it is still coming, its goal is a blend)
+        arm.cLocal.copy(K.cLocal);
+        arm.cGoal.copy(K.cGoal);
+      }
+    }
     // near an anchor the hand takes that anchor's pose; weights fade out within about 6 cm
     let total = 0;
     for (const name in ANCHOR) {
@@ -425,13 +552,94 @@ const RIG = (function () {
     nT.addScaledVector(fT, -nT.dot(fT));
     if (nT.lengthSq() < 1e-6) nT.set(0, 1, 0).addScaledVector(fT, -fT.y);
     nT.normalize();
-    const k = dt > 0 ? 1 - Math.exp(-dt * 14) : 1;
+    let k = dt > 0 ? 1 - Math.exp(-dt * 14) : 1;
+    if (arm.dirSnap > 0) k = lerp(k, 1, arm.dirSnap);
     arm.fwd.lerp(fT, k).normalize();
     arm.up.lerp(nT, k);
     arm.up.addScaledVector(arm.fwd, -arm.up.dot(arm.fwd)).normalize();
     arm.curl = lerp(arm.curl, arm.curlT, k);
     arm.thumb = lerp(arm.thumb, arm.thumbT, k);
     arm.grip.copy(arm.wrist).addScaledVector(arm.fwd, arm.gd); // where the palm / fingertips really are
+  }
+
+  // ---- finger kinematics (shared by the avatar, which draws them, and by the cloth, which is touched by them) ----
+  // a = { side, wrist, fwd (wrist -> knuckles), up (out of the back of the hand), curl | fingers[4], thumb, pinch }
+  const hq1 = V(),
+    hq2 = V(),
+    hq3 = V(),
+    hq4 = V(),
+    hq5 = V();
+  function makeHandPoints() {
+    const four = () => [V(), V(), V(), V()];
+    return { X: V(), palm: V(), base: four(), mid: four(), tip: four(), rad: [0, 0, 0, 0], tipR: [0, 0, 0, 0], padIdx: V(), padN: V(), thumbBase: V(), thumbMid: V(), thumbTip: V(), thumbPad: V(), pinchMid: V(), clamp: V(), idxSide: V() };
+  }
+  function handPoints(a, out) {
+    const f = a.fwd,
+      n = a.up,
+      W = a.wrist,
+      lat = -a.side; // the thumb side along X
+    const X = out.X.crossVectors(n, f).normalize();
+    out.palm.copy(W).addScaledVector(f, 0.05).addScaledVector(n, -0.002);
+    for (let i = 0; i < 4; i++) {
+      const F = BODY.fingers[i],
+        c = a.fingers ? a.fingers[i] : a.curl;
+      const th1 = 0.1 + c * 1.2,
+        th2 = th1 + 0.12 + c * 1.35;
+      const A = out.base[i].copy(W).addScaledVector(f, BODY.palm - F[1]).addScaledVector(X, lat * F[0]);
+      const B = out.mid[i].copy(A).addScaledVector(f, Math.cos(th1) * F[2]).addScaledVector(n, -Math.sin(th1) * F[2]);
+      out.tip[i].copy(B).addScaledVector(f, Math.cos(th2) * F[3]).addScaledVector(n, -Math.sin(th2) * F[3]);
+      out.rad[i] = F[4];
+      out.tipR[i] = F[4] * 0.82;
+      if (i === 0) {
+        out.padN.copy(f).multiplyScalar(-Math.sin(th2)).addScaledVector(n, -Math.cos(th2)); // out of the index pad
+        out.padIdx.copy(out.tip[0]).addScaledVector(out.padN, out.tipR[0]);
+      }
+    }
+    const th = a.thumb,
+      L1 = BODY.thumb[0],
+      L2 = BODY.thumb[1],
+      tr = BODY.thumb[2];
+    const D = out.thumbBase.copy(W).addScaledVector(f, 0.03).addScaledVector(X, lat * 0.033).addScaledVector(n, -0.006);
+    const lw = a.pinchLat && a.pinch != null ? (a.pinchW == null ? 1 : a.pinchW) : 0;
+    if (lw > 0) D.addScaledVector(f, 0.018 * lw).addScaledVector(n, -0.006 * lw); // a key pinch brings the thumb's root forward under the index
+    hq1.set(0, 0, 0).addScaledVector(f, 0.78 - 0.1 * th).addScaledVector(X, lat * (0.6 - 0.5 * th)).addScaledVector(n, -(0.12 + 0.62 * th)).normalize();
+    out.thumbMid.copy(D).addScaledVector(hq1, L1);
+    hq1.addScaledVector(f, 0.35).addScaledVector(X, -lat * 0.25).normalize();
+    out.thumbTip.copy(out.thumbMid).addScaledVector(hq1, L2);
+    // the index's radial side, a little behind its tip (a key pinch closes the thumb pad onto it)
+    out.idxSide.copy(out.mid[0]).lerp(out.tip[0], 0.45).addScaledVector(X, lat * out.rad[0]);
+    const pw = a.pinch == null ? 0 : a.pinchW == null ? 1 : a.pinchW;
+    if (pw > 0) {
+      // two-bone thumb closing onto the index pad (the natural knuckle gives the bending plane), or onto its side
+      hq4.copy(out.thumbMid);
+      hq5.copy(out.thumbTip);
+      if (a.pinchLat) hq2.copy(out.idxSide).addScaledVector(X, lat * (a.pinch + tr)).sub(D);
+      else hq2.copy(out.padIdx).addScaledVector(out.padN, a.pinch + tr).sub(D);
+      let d = hq2.length();
+      const dmax = L1 + L2 - 1e-4;
+      if (d > dmax) d = dmax;
+      if (d < 0.02) d = 0.02;
+      hq2.normalize();
+      const along = (L1 * L1 - L2 * L2 + d * d) / (2 * d),
+        h = Math.sqrt(Math.max(0, L1 * L1 - along * along));
+      hq3.subVectors(out.thumbMid, D);
+      hq3.addScaledVector(hq2, -hq3.dot(hq2));
+      if (hq3.lengthSq() < 1e-10) hq3.copy(n).negate();
+      hq3.normalize();
+      out.thumbMid.copy(D).addScaledVector(hq2, along).addScaledVector(hq3, h);
+      out.thumbTip.copy(D).addScaledVector(hq2, d);
+      if (pw < 1) {
+        out.thumbMid.lerp(hq4, 1 - pw);
+        out.thumbTip.lerp(hq5, 1 - pw);
+      }
+    }
+    const idxC = a.pinchLat && pw > 0 ? out.idxSide : out.padIdx;
+    hq1.subVectors(idxC, out.thumbTip);
+    if (hq1.lengthSq() < 1e-10) hq1.copy(out.padN).negate();
+    out.thumbPad.copy(out.thumbTip).addScaledVector(hq1.normalize(), tr);
+    out.pinchMid.copy(idxC).add(out.thumbPad).multiplyScalar(0.5);
+    out.clamp.copy(out.tip[0]).add(out.tip[1]).multiplyScalar(0.5);
+    return out;
   }
 
   // ---- whole body ----
@@ -448,6 +656,35 @@ const RIG = (function () {
       if (need > 0) c += need * need;
     }
     return c * 60 + px * px * 0.02 + py * py * 0.06 + pz * pz * 0.1;
+  }
+  // a planned contact: after the hand has been turned (within the wrist's limit), move the wrist so the contact point lands
+  // on its goal; up to four passes, each from the same previous pose, so the smoothing still runs once per frame
+  const cs0 = { sw: 0, fwd: V(), up: V(), curl: 0, thumb: 0 },
+    cfX = V(),
+    cfE = V();
+  function saveArm(a) {
+    cs0.sw = a.swivel;
+    cs0.fwd.copy(a.fwd);
+    cs0.up.copy(a.up);
+    cs0.curl = a.curl;
+    cs0.thumb = a.thumb;
+  }
+  function contactFix(a, dt) {
+    for (let it = 0; it < 4; it++) {
+      cfX.crossVectors(a.up, a.fwd);
+      cfE.copy(a.wrist).addScaledVector(cfX, a.cLocal.x).addScaledVector(a.up, a.cLocal.y).addScaledVector(a.fwd, a.cLocal.z);
+      cfE.subVectors(a.cGoal, cfE).multiplyScalar(a.cw);
+      if (cfE.lengthSq() < 1e-8) return;
+      a.target.add(cfE);
+      freeTarget(a.target, a.clear);
+      a.swivel = cs0.sw;
+      a.fwd.copy(cs0.fwd);
+      a.up.copy(cs0.up);
+      a.curl = cs0.curl;
+      a.thumb = cs0.thumb;
+      solveArm(a, dt);
+      solveHand(a, dt);
+    }
   }
   function solve(inp) {
     const dt = inp.snap ? 0 : inp.dt || 0;
@@ -506,8 +743,10 @@ const RIG = (function () {
         a.upT.applyQuaternion(q2);
       }
       freeTarget(a.target, a.clear);
+      if (a.cw > 0) saveArm(a);
       solveArm(a, dt);
       solveHand(a, dt);
+      if (a.cw > 0) contactFix(a, dt);
     }
     S.diag.clampL = S.arms[1].clamp;
     S.diag.clampR = S.arms[-1].clamp;
@@ -525,5 +764,5 @@ const RIG = (function () {
     }
     return S;
   }
-  return { S, solve, lapHeight, setLapWide: (w) => (lapWide = w || 0), obstacles, REACH, torsoQuat, shoulderAt, TRUNK, KNEE, trunkPush, freeTarget, setAnchors, ANCHOR };
+  return { S, solve, handPoints, makeHandPoints, lapHeight, setLapWide: (w) => (lapWide = w || 0), obstacles, REACH, torsoQuat, shoulderAt, TRUNK, KNEE, trunkPush, freeTarget, setAnchors, ANCHOR };
 })();

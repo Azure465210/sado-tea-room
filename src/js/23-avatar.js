@@ -766,13 +766,7 @@ function makeAvatar(teacher) {
   })();
 
   // ---- arms, sleeves and hands (placed every frame from the rig) ----
-  const FINGERS = [
-    // [across the palm (+ = thumb side), knuckle set-back, first bone, second bone, radius]: index, middle, ring, little
-    [0.0275, 0.003, 0.04, 0.033, 0.0078],
-    [0.0092, 0, 0.043, 0.035, 0.008],
-    [-0.0092, 0.003, 0.04, 0.033, 0.0076],
-    [-0.0275, 0.011, 0.032, 0.027, 0.0068],
-  ];
+  const FINGERS = BODY.fingers; // [across the palm, knuckle set-back, first bone, second bone, radius] (20-rig)
   const SLEEVE_N = 8;
   const ARM = {};
   for (const s of [1, -1]) {
@@ -876,36 +870,27 @@ function makeAvatar(teacher) {
       if (i === SLEEVE.length - 2 && A.hem) A.hem.set(tD.x + ox * out, botY, tD.z + oz * out, ox * thick, oz * thick);
     }
     A.sleeve.done();
-    // hand: palm, four fingers held together, thumb on the inner side
+    // hand: palm, four fingers held together, thumb on the inner side (RIG.handPoints: the same kinematics the cloth uses)
     const f = a.fwd,
-      n = a.up;
-    tX.crossVectors(n, f).normalize(); // across the palm
-    const lat = -side; // thumb side along tX
-    m4.makeBasis(tX, n, f);
+      n = a.up,
+      HP = RIG.handPoints(a, A.hp || (A.hp = RIG.makeHandPoints()));
+    m4.makeBasis(HP.X, n, f);
     A.palm.quaternion.setFromRotationMatrix(m4);
-    A.palm.position.copy(a.wrist).addScaledVector(f, 0.05).addScaledVector(n, -0.002);
-    const curl = a.curl;
+    A.palm.position.copy(HP.palm);
     for (let i = 0; i < 4; i++) {
       const F = FINGERS[i],
         G = A.fingers[i];
-      const fingerCurl = a.fingers ? a.fingers[i] : curl;
-      const th1 = 0.1 + fingerCurl * 1.2,
-        th2 = th1 + 0.12 + fingerCurl * 1.35;
-      tA.copy(a.wrist).addScaledVector(f, BODY.palm - F[1]).addScaledVector(tX, lat * F[0]);
-      tB.copy(tA).addScaledVector(f, Math.cos(th1) * F[2]).addScaledVector(n, -Math.sin(th1) * F[2]);
-      tC.copy(tB).addScaledVector(f, Math.cos(th2) * F[3]).addScaledVector(n, -Math.sin(th2) * F[3]);
-      tD.copy(tA); // seg() uses tA
+      tD.copy(HP.base[i]);
+      tB.copy(HP.mid[i]);
+      tC.copy(HP.tip[i]);
       seg(G[0], tD, tB);
       seg(G[1], tB, tC);
       G[2].position.copy(tC);
       if (A.claws) clawAt(A.claws[i], tB, tC, F[4] * 0.55);
     }
-    const th = a.thumb;
-    tD.copy(a.wrist).addScaledVector(f, 0.03).addScaledVector(tX, lat * 0.033).addScaledVector(n, -0.006);
-    tE.set(0, 0, 0).addScaledVector(f, 0.78 - 0.1 * th).addScaledVector(tX, lat * (0.6 - 0.5 * th)).addScaledVector(n, -(0.12 + 0.62 * th)).normalize();
-    tB.copy(tD).addScaledVector(tE, 0.042);
-    tE.addScaledVector(f, 0.35).addScaledVector(tX, -lat * 0.25).normalize();
-    tC.copy(tB).addScaledVector(tE, 0.032);
+    tD.copy(HP.thumbBase);
+    tB.copy(HP.thumbMid);
+    tC.copy(HP.thumbTip);
     seg(A.thumb[0], tD, tB);
     seg(A.thumb[1], tB, tC);
     A.thumb[2].position.copy(tC);

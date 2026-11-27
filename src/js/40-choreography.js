@@ -1,7 +1,11 @@
 // ---------- rest pose & helpers ----------
 const REST_ROT=1.36,ONKAMA_ROT=0.8,DIP_ROT=0.3;   // point the kettle handle toward the right hand for a shallower reach across the chest
 const HIP_L=h2s(...HAND.hip(1));        // where the fukusa hangs from the obi: her left hip
-const FUK_TUCKED=[0.09,4,0.14],FUK_OPEN=[0.27,1,0.28],FUK_PAD=[0.09,6,0.14];
+// the tucked packet's orientation (P-frame) at the obi: its long side hangs down along the hip, its face toward her left
+const FUK_OBI_EULER=(()=>{const a=-20*Math.PI/180,U=new THREE.Vector3(0,-1,0),V=new THREE.Vector3(-Math.sin(a),0,Math.cos(a)),Nn=new THREE.Vector3(-Math.cos(a),0,-Math.sin(a));
+  const m=new THREE.Matrix4().makeBasis(U,Nn.clone().negate(),V);const e=new THREE.Euler().setFromRotationMatrix(m);return [e.x,e.y,e.z];})();
+// the scoop rides in on the bowl, across its rim, face down, tip to her left (it is taken from the bowl for its wiping)
+const CHASHAKU_ON_BOWL=[-0.01,0.082,0.4],CHASHAKU_ON_BOWL_ROT=[0,2.62,Math.PI];   // its node end toward her right hand, so it is taken without a deep bow
 const KAMALID_ON_KAMA=[KAMA[0],0.285,KAMA[2]],KAMALID_ON_FUTAOKI=[FUTA[0],0.058,FUTA[2]];
 const CHAKIN_IN_BOWL=[-0.02,0.03,0.42],CHAKIN_ON_LID=[FUTA[0],0.072,FUTA[2]-0.01],CHAKIN_ASIDE=[-0.3,0.006,0.27];
 const KASHIKI_HOME=[0.36,0,0.36],KASHIKI_SERVED=[0.4,0,0.5];
@@ -12,7 +16,7 @@ const REST={
   lid:{pos:[0.12,0.052,0.42],rot:[0,0,0]},
   chashaku:{pos:[0.12,0.085,0.42],rot:[0,1.25,0]},
   hishaku:{pos:[FUTA[0],0.07,FUTA[2]],rot:[0,REST_ROT,-0.18]},   // on the lid rest, handle toward her left knee, its end on the tatami
-  fukusa:{pos:[...HIP_L],rot:[1.57,0.35,0],scale:FUK_TUCKED},
+  fukusa:{pos:[...HIP_L],rot:FUK_OBI_EULER},
   chakin:{pos:CHAKIN_IN_BOWL,rot:[0,0,0]},
   kamaLid:{pos:KAMALID_ON_KAMA,rot:[0,0,0]},
   kashiki:{pos:KASHIKI_HOME,rot:[0,0,0]},
@@ -26,7 +30,7 @@ const POSE_OPEN={kamaLid:{pos:KAMALID_ON_FUTAOKI},chakin:{pos:CHAKIN_ON_LID},his
 const POSE_SWEETS={kashiki:{pos:KASHIKI_SERVED}};
 // before the tea making starts, the bowl, the tea container and the whisk wait a little further out (so the host can bow with her hands in front of her knees)
 const PRE=0.2,pre=p=>[p[0],p[1],p[2]+PRE];
-const POSE_PRE={bowl:{pos:pre(REST.bowl.pos)},natsume:{pos:pre(REST.natsume.pos)},lid:{pos:pre(REST.lid.pos)},chashaku:{pos:pre(REST.chashaku.pos)},chasen:{pos:pre(REST.chasen.pos)},chakin:{pos:pre(CHAKIN_IN_BOWL)}};
+const POSE_PRE={bowl:{pos:pre(REST.bowl.pos)},natsume:{pos:pre(REST.natsume.pos)},lid:{pos:pre(REST.lid.pos)},chashaku:{pos:pre(CHASHAKU_ON_BOWL),rot:CHASHAKU_ON_BOWL_ROT},chasen:{pos:pre(REST.chasen.pos)},chakin:{pos:pre(CHAKIN_IN_BOWL)}};
 const POSE_CLOSED={kashiki:{pos:KASHIKI_SERVED},chakin:{pos:CHAKIN_ASIDE}};
 function setPos(o,v){if(o.pos)o.pos.set(v[0],v[1],v[2]);else o.position.set(v[0],v[1],v[2]);}
 function getPos(o){return o.pos||o.position;}
@@ -45,6 +49,8 @@ function applyTracks(tracks,t,tOsc){if(tOsc==null)tOsc=t;
   }
 }
 const R=REST,HR=R.handR.pos,HL=R.handL.pos,B=R.bowl.pos,N=R.natsume.pos,KT=[KAMA[0],0.3,KAMA[2]];
+// in the purification the natsume stands just in front of her right knee, where the left hand takes it without bowing; it goes to its place N at the end of the step
+const N2=[0.07,0,0.3],N2L=[N2[0],0.052,N2[2]],N2C=[N2[0],0.085,N2[2]];
 // body-relative hand places (see HAND in the host section), in stage coordinates
 const KNL=h2s(...HAND.knee(1)),KNR=h2s(...HAND.knee(-1));     // palms on the knees
 const FTL=h2s(...HAND.flat(1)),FTR=h2s(...HAND.flat(-1));     // palms flat on the tatami, index fingers touching: the formal bow (shin)
@@ -103,30 +109,56 @@ const STEPS=[
   holds:[{o:'kashiki',hand:'L',t0:2,t1:7.5,palm:'up'},{o:'kashiki',hand:'R',t0:2,t1:7.5,assist:true}],
   qs:[['Why eat the sweet first?','The sweet lines the mouth with sweetness, so the slightly bitter matcha tastes round and clean. It is never eaten with the tea.'],['What is higashi?','Dry pressed sugar sweets, often shaped like flowers or leaves. They are picked up with the fingers and need no kuromoji; they usually go with thin tea.']]},
  {title:'Purify the tools',jp:'清め',ro:'kiyome',gloss:'purifying the utensils',dur:49,pose:{...POSE_SWEETS,...POSE_PRE},
-  lines:[[0.4,'First I bring the bowl, the tea container and the whisk in front of my knees.'],...laterLines(8,[[0.5,'I draw the triangular fukusa from my obi with my left hand and pinch the opposite corner with my right.'],[9,'I tuck the loose edge, fold over my left thumb, and crease the tail with my right index finger. Then I wipe the tea container, the natsume.'],[25,'Then the bamboo scoop, the chashaku: three wipes along it.'],[32,'They are already clean. This is to calm my mind and to show respect to you.']])],
+  lines:[[0.4,'First I bring the bowl, the tea container and the whisk in front of my knees.'],
+   [8.5,'My left hand draws the fukusa from my obi; my right lifts the far corner until the diagonal stands upright.'],
+   [16.4,'I fold in the loose sail, then turn my left palm up.'],
+   [21.4,'I fold it in half over my thumb. My index finger draws a line, then tucks the tail under.'],
+   [28.7,'Now the tea container, the natsume: I wipe the lid.'],
+   [33.4,'I fold the fukusa again and rest it on my left palm.'],
+   [39.1,'Then the bamboo scoop, the chashaku: three wipes.'],
+   [42.6,'They are already clean. This is to calm my mind and to show respect to you.']],
+  // 9.5–29 and 33.6–39.1 the cloth and both hands are authored by 41-fukusa (fukusaHandling); the tracks below carry the rest
   tracks:[
-          // bring the utensils in: bowl (the chakin rides in it), natsume (lid and scoop ride on it), whisk
-          {o:'handR',p:'pos',k:[[0.3,...HR],[1.4,...pre(B)],[2.6,...B],[3.7,...pre(N)],[4.9,...N],[5.9,...pre(R.chasen.pos)],[7,...R.chasen.pos],[7.9,...HR]]},
+          // bring the utensils in: bowl (the chakin and the scoop ride on it), natsume (its lid rides on it), whisk
+          {o:'handR',p:'pos',k:[[0.3,...HR],[1.4,...pre(B)],[2.6,...B],[3.7,...pre(N)],[4.9,...N2],[5.9,...pre(R.chasen.pos)],[7,...R.chasen.pos],[7.9,...HR],[11.1,...HR],
+                                [28.6,0.07,0.38,0.12],[29.0,0.05,0.37,0.11],[33.6,0.06,0.33,0.12],[38.9,0.08,0.36,0.14],[39.1,0.1,0.35,0.13],[43.3,0.1,0.25,0.35],[44.2,...HR],[46.2,...HR],[46.6,N2[0]+0.036,0.04,N2[2]-0.01],[47.8,N[0]+0.036,0.04,N[2]-0.01],[48.6,...HR]]},
           {o:'bowl',p:'pos',k:[[1.4,...pre(B)],[2.6,...B]]},{o:'chakin',p:'pos',k:[[1.4,...pre(CHAKIN_IN_BOWL)],[2.6,...CHAKIN_IN_BOWL]]},
-          {o:'natsume',p:'pos',k:[[3.7,...pre(N)],[4.9,...N]]},{o:'lid',p:'pos',k:[[3.7,...pre(R.lid.pos)],[4.9,...R.lid.pos]]},{o:'chashaku',p:'pos',k:[[3.7,...pre(R.chashaku.pos)],[4.9,...R.chashaku.pos]]},
+          {o:'natsume',p:'pos',k:[[3.7,...pre(N)],[4.9,...N2],[29.8,...N2],[30.4,0,0.15,0.24],[32.6,0,0.15,0.24],[32.9,...N2],[46.6,...N2],[47.8,...N]]},
+          {o:'lid',p:'pos',k:[[3.7,...pre(R.lid.pos)],[4.9,...N2L],[29.8,...N2L],[30.4,0,0.202,0.24],[32.6,0,0.202,0.24],[32.9,...N2L],[46.6,...N2L],[47.8,...R.lid.pos]]},
           {o:'chasen',p:'pos',k:[[5.9,...pre(R.chasen.pos)],[7,...R.chasen.pos]]},
-          {o:'torso',p:'rot',k:[[0.3,0,0,0],[1.4,0.3,0,0],[7,0.3,0,0],[7.9,0,0,0]]},
-          ...later(8,[{o:'handR',p:'pos',k:[[0.5,...HR],[2.9,...HR],[3.55,0.23,0.57,0.31],[4.35,0.19,0.62,0.36],[12.6,0.06,0.52,0.3+NB],[21.0,0.14,0.13,0.42],[23.5,0.14,0.13,0.42],[25.5,0.1,0.42,0.34+NB],[30.5,0.1,0.42,0.34+NB],[32.0,0.12,0.12,0.42],[33.5,0.08,0.5,0.3+NB],[34.3,0.08,0.5,0.3+NB],[35.4,...HR]]},
-          {o:'fukusa',p:'pos',k:[[1.5,...HIP_L],[3.0,0.06,0.5,0.3+NB],[12.6,0.06,0.5,0.3+NB],[21.0,0.13,0.085,0.38],[23.5,0.13,0.085,0.38],[25.5,0.1,0.39,0.34+NB],[30.5,0.1,0.39,0.34+NB],[32.0,0.12,0.09,0.38],[33.5,0.08,0.48,0.3+NB],[35.0,...HIP_L]]},
-          {o:'fukusa',p:'rot',k:[[1.5,1.57,0.35,0],[3.0,1.57,0,0],[12.6,1.57,0,0],[21.0,0,0,0],[23.5,0,0,0],[25.5,-0.3,0,0],[30.5,-0.3,0,0],[32.0,0,0,0],[33.5,1.57,0,0],[35.0,1.57,0.35,0]]},
-          {o:'fukusa',p:'scale',k:[[1.5,...FUK_TUCKED],[3.0,...FUK_OPEN],[12.6,...FUK_OPEN],[16.8,0.09,3,0.28],[21.0,...FUK_PAD],[33.0,...FUK_PAD],[33.5,...FUK_OPEN],[34.6,...FUK_TUCKED]]},
-          {o:'torso',p:'rot',k:[[12.0,0,0,0],[21.0,0.32,0,0.05],[23.5,0.32,0,0.05],[25.0,0.12,0,0],[30.5,0.12,0,0],[32.0,0.26,0,0.05],[33.5,0,0,0]]},
-          {o:'fukusa',p:'pos',osc:{axis:'x',amp:0.015,freq:1.5,t0:21.0,t1:23.5}},{o:'handR',p:'pos',osc:{axis:'x',amp:0.015,freq:1.5,t0:21.0,t1:23.5}},
-          {o:'handL',p:'pos',k:[[0.5,...HL],[1.5,...HIP_L],[3.0,0.0,0.5,0.3+NB],[11.4,0.0,0.5,0.3+NB],[16.2,...HL],[21.0,0.08,0.05,0.42],[23.5,0.08,0.05,0.42],[24.0,...HL],[24.5,0.12,0.11,0.42],[25.5,0.0,0.4,0.34+NB],[30.5,0.0,0.4,0.34+NB],[32.0,0.12,0.11,0.42],[32.8,...HL],[33.8,0.03,0.48,0.3+NB],[35.0,...HIP_L],[36.0,...HL]]},
-          {o:'chashaku',p:'pos',k:[[24.5,...R.chashaku.pos],[25.5,0.06,0.4,0.34+NB],[30.5,0.06,0.4,0.34+NB],[32.0,...R.chashaku.pos]]},
-          {o:'chashaku',p:'rot',k:[[24.5,0,1.25,0],[25.5,0,-1.57,0],[30.5,0,-1.57,0],[32.0,0,1.25,0]]},
-          {o:'fukusa',p:'pos',osc:{axis:'x',amp:0.05,freq:0.6,t0:25.8,t1:30.5}},{o:'handR',p:'pos',osc:{axis:'x',amp:0.05,freq:0.6,t0:25.8,t1:30.5}}])],
-  holds:[{o:'bowl',hand:'R',t0:1.4,t1:2.6,grip:'bowlSide'},{o:'chakin',hand:'R',t0:1.4,t1:2.6,rider:true},
-         {o:'natsume',hand:'R',t0:3.7,t1:4.9,grip:'natsumeSide'},{o:'lid',hand:'R',t0:3.7,t1:4.9,rider:true},{o:'chashaku',hand:'R',t0:3.7,t1:4.9,rider:true},
+          {o:'chashaku',p:'pos',k:[[1.4,...pre(CHASHAKU_ON_BOWL)],[2.6,...CHASHAKU_ON_BOWL],[39.45,...CHASHAKU_ON_BOWL],[40.05,0.03,0.33,0.12],[42.5,0.03,0.33,0.12],[43.3,...N2C],[46.6,...N2C],[47.8,...R.chashaku.pos]]},
+          {o:'chashaku',p:'rot',k:[[0,...CHASHAKU_ON_BOWL_ROT],[39.45,...CHASHAKU_ON_BOWL_ROT],[40.05,0,Math.PI/2,0],[42.5,0,Math.PI/2,0],[43.3,...R.chashaku.rot]]},
+          {o:'torso',p:'rot',k:[[0.3,0,0,0],[1.4,0.25,0,0],[7,0.25,0,0],[7.9,0,0,0],[8.5,0,0,0],[9.5,0.05,0,0.04],[11.6,0.04,0,0],[29.0,0.08,0,0],[29.8,0.15,0,0],[30.4,0.08,0,0],[32.3,0.08,0,0],[32.9,0.15,0,0],[33.3,0.05,0,0],[39.1,0.05,0,0],[39.45,0.12,0,0],[40.05,0.05,0,0],[42.5,0.05,0,0],[43.3,0.15,0,0],[44.0,0,0,0],[46.2,0,0,0],[46.6,0.15,0,0],[47.8,0.25,0,0],[48.6,0,0,0]]},
+          // the left hand: to the obi's edge, (the folding), to the knee, to the natsume, (the second folding), the pad on its palm, back to the obi
+          {o:'handL',p:'pos',k:[[8.5,...HL],[9.5,-0.12,0.52,-0.02],[27.95,-0.12,0.38,0.12],[28.6,...KNL],[29.0,...KNL],[29.8,N2[0]-0.036,0.03,N2[2]-0.01],[32.9,N2[0]-0.036,0.03,N2[2]-0.01],[33.3,-0.06,0.33,0.07],[33.6,-0.06,0.33,0.07],[39.1,-0.02,0.32,0.13],[45.2,...HIP_L],[46.2,...HL]]},
+          // the pad (P-frame: its centre, stack top down, わ edge to her right): natsume こ wipe, then the scoop
+          {o:'fukusa',p:'pos',k:[[0,...HIP_L],[9.5,...HIP_L],[29.0,0.05,0.36,0.11],[29.8,0.08,0.31,0.17],[30.2,-0.03,0.245,0.258],[30.4,-0.03,0.235,0.258],[31.0,0.03,0.235,0.258],[31.2,-0.03,0.24,0.222],[31.8,0.03,0.235,0.222],[31.95,0,0.235,0.255],[32.3,0,0.235,0.225],[32.6,0.07,0.25,0.24],[33.3,0.06,0.32,0.12],[39.1,0,0.38,0.16],
+                                [40.05,0.03,0.3225,0.12],[40.3,0.03,0.3225,0.12],[41.0,-0.05,0.3225,0.12],[41.2,-0.05,0.33,0.1115],[41.5,0.045,0.33,0.1115],[41.8,-0.05,0.33,0.1115],[42.05,-0.05,0.3275,0.12],[42.18,0.03,0.3275,0.12],[42.38,-0.05,0.3225,0.12],[42.43,-0.05,0.3215,0.12],[42.5,-0.05,0.3225,0.15],[43.3,-0.05,0.33,0.15],[45.2,...HIP_L]]},
+          {o:'fukusa',p:'rot',k:[[0,...FUK_OBI_EULER],[9.5,...FUK_OBI_EULER],[29.0,0,0,0],[33.3,0,0,0],[39.1,0,0,Math.PI],[41.0,0,0,Math.PI],[41.2,Math.PI/2,0,Math.PI],[41.8,Math.PI/2,0,Math.PI],[42.05,0,0,Math.PI],[43.3,0,0,Math.PI],[45.2,...FUK_OBI_EULER]]}],
+  holds:[{o:'bowl',hand:'R',t0:1.4,t1:2.6,grip:'bowlSide'},{o:'chakin',hand:'R',t0:1.4,t1:2.6,rider:true},{o:'chashaku',hand:'R',t0:1.4,t1:2.6,rider:true},
+         {o:'natsume',hand:'R',t0:3.7,t1:4.9,grip:'natsumeSide'},{o:'lid',hand:'R',t0:3.7,t1:4.9,rider:true},
          {o:'chasen',hand:'R',t0:5.9,t1:7,noflip:true},
-         ...laterHolds(8,[{o:'fukusa',hand:'L',t0:1.5,t1:8.35},{o:'fukusa',hand:'L',t0:10,t1:19.5},{o:'fukusa',hand:'R',t0:4.65,t1:34.2},{o:'fukusa',hand:'L',t0:33.8,t1:35.0},{o:'chashaku',hand:'L',t0:24.5,t1:32.0,palm:'in'}])],
-  poses:[[2,'Bringing the bowl','茶碗を引く','the bowl comes in front of the knees'],[10.65,'Drawing the silk','帛紗を取る','clamp near the left corner and leave a short tail'],[13.7,'Pinch and lift','帛紗を立てる','pinch inside the far-right corner and raise the right elbow'],[17,'Release and regrip','持ち替える','let go with the left, then take the middle of the right edge'],[19.4,'Tucking the sail','折り込む','tuck the loose edge with the left fingers and press the crease'],[21.35,'Left thumb at center','親指で押さえる','turn the left palm up and bring the cloth level'],[23.55,'Fold in half','半分に畳む','bring the opposite corners together over the left thumb'],[24.45,'Draw the horizontal stroke','一の字','straighten the right index to sweep across the top'],[25.7,'Curl the tail under','つの字','turn the right wrist and curve the index down'],[26.95,'Both palms up','持ち替える','take the pad from below with the right fingers'],[28.4,'Release the left hand','左手を引く','slide the left hand back to the knee and turn the right palm down'],[30.2,'Purifying the natsume','棗を清める','wiped across the lid'],[36,'Purifying the scoop','茶杓を清める','three wipes along the bamboo']],
-  qs:[['Is the fukusa only for cleaning?','No. The utensils are clean before the ceremony. Wiping them in front of you prepares the heart, not the object.'],['How is the fukusa folded?','Start with the diagonal triangle. Raise the right corner, then regrip the middle of the edge and tuck the sail with the left fingers. Turn the left palm up, fold the opposite corners together, then use the right index to crease the tail and transfer the pad.']]},
+         {o:'fukusa',hand:'L',t0:9.9,t1:16.35},{o:'fukusa',hand:'L',t0:17.3,t1:27.95},{o:'fukusa',hand:'R',t0:12.45,t1:33.8,grip:'fukusaWipe'},
+         {o:'natsume',hand:'L',t0:29.8,t1:32.9,grip:'natsumeSide'},{o:'lid',hand:'L',t0:29.8,t1:32.9,rider:true},
+         {o:'fukusa',hand:'L',t0:34.1,t1:38.6},{o:'fukusa',hand:'R',t0:34.5,t1:38.5},
+         {o:'fukusa',hand:'L',t0:39.1,t1:43.6,grip:'fukusaPalm'},{o:'fukusa',hand:'L',t0:43.6,t1:45.2,grip:'fukusaObi'},
+         {o:'chashaku',hand:'R',t0:39.45,t1:43.3},
+         {o:'natsume',hand:'R',t0:46.6,t1:47.8,grip:'natsumeSide'},{o:'lid',hand:'R',t0:46.6,t1:47.8,rider:true},{o:'chashaku',hand:'R',t0:46.6,t1:47.8,rider:true}],
+  poses:[[2,'Bringing the bowl','茶碗を引く','the bowl comes in front of the knees'],
+   [10.9,'Drawing the silk','帛紗を取る','clamped near the left corner; a short tail shows past the fingers'],
+   [12.6,'Pinching the far corner','角をつまむ','the right hand comes over the left and pinches 3 cm inside the far corner'],
+   [15.7,'Diagonal upright','帛紗を立てる','right hand above, left below: the diagonal stands straight up and the cloth hangs as a triangle'],
+   [18.9,'Folding in the sail','折り込む','the left fingers fold the loose corner over; the thumb presses the crease'],
+   [21.0,'Thumb at the centre','親指で押さえる','left thumb on the centre, palm turned up'],
+   [23.0,'Fold in half','半分に畳む','the far corner comes down onto the near corner over the thumb'],
+   [24.5,'The stroke 一','一の字','the right index draws across the top'],
+   [25.8,'The curl つ','つの字','the index curls the tail under: four layers'],
+   [27.2,'Both palms up','両手で持つ','the pad sits on the midline between the thumbs'],
+   [28.4,'Ready to wipe','右手に持つ','left hand to the knee, right palm turns down'],
+   [31.0,'Purifying the natsume','棗を清める','the lid is wiped in a こ shape'],
+   [36.0,'Folding again','捌き直し','the fukusa is folded once more'],
+   [41.0,'Purifying the scoop','茶杓を清める','three wipes from the node to the tip']],
+  qs:[['Is the fukusa only for cleaning?','No. The utensils are clean before the ceremony. Wiping them in front of you prepares the heart, not the object.'],['How is the fukusa folded?','Hold the near-left corner with your left hand and pinch just inside the far-right corner with your right. Lift until the diagonal stands straight up and the cloth hangs as a triangle. Fold in the loose sail with the left fingers, put the left thumb on the centre and turn the palm up. Bring the far corner down onto the near corner over the thumb, draw a straight line across with the right index finger, and curl the tail under. The pad then goes into the right hand for wiping.']]},
  {title:'Warm the bowl',jp:'茶碗を温める',ro:'chawan o atatameru',gloss:'warming the bowl',dur:52.5,pose:POSE_SWEETS,
   poses:[[7.2,'Opening the kettle','釜の蓋を取る','ladle upright in the left hand; the right hand lifts the hot lid with the fukusa'],[18.1,'Ladling hot water','湯を汲む','one ladle from the kettle'],[22.7,'Warming the bowl','湯を注ぐ','hot water into the bowl'],[31.1,'Checking the whisk','茶筅通し chasen-tōshi','the whisk is lifted and looked at'],[41.7,'Emptying the bowl','湯を捨てる','into the kensui, with the left hand'],[48,'Wiping the bowl','茶巾で拭く','with the damp linen cloth']],
   lines:[[0.5,'I take the ladle, the hishaku, in my left hand and hold it upright, like a hand mirror. My right hand opens the kettle lid with the fukusa and rests it on the futaoki.'],[11,'The damp linen cloth, the chakin, comes out of the bowl and waits on the lid.'],[14,'Now I warm the bowl: one ladle of hot water from the kettle.'],[25.5,'I rest the ladle on the kettle and check the whisk in the warm water, lifting it to look at the tines.'],[38.5,'Then I pour the water into the waste bowl, the kensui, on my left.'],[42.5,'And I wipe the bowl with the chakin.']],
@@ -138,8 +170,7 @@ const STEPS=[
           // right hand: fukusa from the obi, lift the kettle lid onto the lid rest, fukusa back
           {o:'handR',p:'pos',k:[[2,...HR],[3.5,...HIP_L],[5,KAMA[0],0.35,KAMA[2]],[5.8,KAMA[0],0.35,KAMA[2]],[6.6,KAMA[0],0.47,KAMA[2]],[8,FUTA[0],0.12,FUTA[2]],[8.6,FUTA[0],0.12,FUTA[2]],[10,...HIP_L],[11,...HR]]},
           {o:'fukusa',p:'pos',k:[[3.5,...HIP_L],[5,KAMA[0],0.31,KAMA[2]],[5.8,KAMA[0],0.31,KAMA[2]],[6.6,KAMA[0],0.465,KAMA[2]],[8,FUTA[0],0.085,FUTA[2]],[8.6,FUTA[0],0.085,FUTA[2]],[10,...HIP_L]]},   // the pad stays on the lid while it travels
-          {o:'fukusa',p:'rot',k:[[3.5,1.57,0.35,0],[5,0,0,0],[8.6,0,0,0],[10,1.57,0.35,0]]},
-          {o:'fukusa',p:'scale',k:[[3.5,...FUK_TUCKED],[5,...FUK_PAD],[8.6,...FUK_PAD],[10,...FUK_TUCKED]]},
+          {o:'fukusa',p:'rot',k:[[3.5,...FUK_OBI_EULER],[5,0,0,0],[8.6,0,0,0],[10,...FUK_OBI_EULER]]},
           {o:'kamaLid',p:'pos',k:[[5.8,...KAMALID_ON_KAMA],[6.6,KAMA[0],0.44,KAMA[2]],[8,...KAMALID_ON_FUTAOKI]]},
           {o:'torso',p:'rot',k:[[3.5,0,0,0],[5,0.12,0,0.2],[8.6,0.12,0,0.2],[10,0,0,0]]},
           // chakin from the bowl onto the lid, with the right hand
