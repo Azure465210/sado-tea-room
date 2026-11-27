@@ -1,6 +1,6 @@
 // ---------- teachers: who hosts the lesson ----------
 // Each teacher brings a portrait (whose face becomes the avatar's face), a body style, a voice and a way of speaking.
-// Shizue has an English script; the other instructors have Japanese scripts with English translations.
+// Shizue has an English script; Ifu has a Japanese script with an English translation.
 // The asset tokens become `null` when a file is missing at build
 // time (tools/build.js), so every lookup below falls back: shizue's art, the English lines, or a built-in placeholder.
 const parseJSON = (s) => {
@@ -83,60 +83,6 @@ const TEACHERS = {
   };
   T.greeting = sc.greeting || { ja: 'お初にお目にかかります。虚音イフと申します。', en: 'A pleasure to meet you. I am Urone If.', yomi: 'おはつにおめにかかります。うろねいふともうします。' };
 }
-// ---- navigators: Shizue-sensei performs the ceremony silently, and the navigator explains it from a small corner window
-// (the navigator window, 52-navigator.js) in Japanese, with the English under the caption. Each has its own script with the
-// same schema and times as ifu's (src/data/<id>-script.json). The selector (window.SadoSelector) draws their busts. ----
-const NAVIGATOR_SCRIPTS = {
-  akane: /*@TEXT:src/data/akane-script.json@*/,
-  aoi: /*@TEXT:src/data/aoi-script.json@*/,
-  reimu: /*@TEXT:src/data/reimu-script.json@*/,
-  marisa: /*@TEXT:src/data/marisa-script.json@*/,
-  zundamon: /*@TEXT:src/data/zundamon-script.json@*/,
-  metan: /*@TEXT:src/data/metan-script.json@*/,
-  tsumugi: /*@TEXT:src/data/tsumugi-script.json@*/,
-  zunko: /*@TEXT:src/data/zunko-script.json@*/,
-  kiritan: /*@TEXT:src/data/kiritan-script.json@*/,
-  itako: /*@TEXT:src/data/itako-script.json@*/,
-};
-const NAVIGATORS = [
-  // id, English name, Japanese name, voice engine (for the texts)
-  ['akane', 'Kotonoha Akane', '琴葉茜', 'A.I.VOICE'],
-  ['aoi', 'Kotonoha Aoi', '琴葉葵', 'A.I.VOICE'],
-  ['reimu', 'Yukkuri Reimu', 'ゆっくり霊夢', 'AquesTalk'],
-  ['marisa', 'Yukkuri Marisa', 'ゆっくり魔理沙', 'AquesTalk'],
-  ['zundamon', 'Zundamon', 'ずんだもん', 'VOICEVOX'],
-  ['metan', 'Shikoku Metan', '四国めたん', 'VOICEVOX'],
-  ['tsumugi', 'Kasukabe Tsumugi', '春日部つむぎ', 'VOICEVOX'],
-  ['zunko', 'Tohoku Zunko', '東北ずん子', 'VOICEVOX'],
-  ['kiritan', 'Tohoku Kiritan', '東北きりたん', 'VOICEVOX'],
-  ['itako', 'Tohoku Itako', '東北イタコ', 'VOICEVOX'],
-];
-for (const [id, name, nameJa, engine] of NAVIGATORS) {
-  const sc = parseJSON(NAVIGATOR_SCRIPTS[id]) || null;
-  TEACHERS[id] = {
-    id,
-    name,
-    nameJa,
-    romaji: name,
-    lang: 'ja',
-    teaRole: 'navigator',
-    performer: 'shizue', // who makes the tea (the avatar, the fukusa)
-    narrator: id, // who speaks the lines
-    art: SHIZUE_ART,
-    fukusa: TEACHERS.shizue.fukusa,
-    alt: name + ' (' + nameJa + '), navigator',
-    intro: 'Shizue-sensei makes a bowl of usucha, thin tea, in eight short steps, and ' + name + ' explains each one from a small window, in Japanese with English subtitles. At the end, you whisk a bowl yourself.',
-    voiceLabel: 'Read the explanations aloud (' + name + ', Japanese voice; English subtitles)',
-    headDesc: TEACHERS.shizue.headDesc.replace('Today Shizue-sensei explains everything in English.', 'Today ' + name + ' explains each step from the corner window.'),
-    engine,
-    card: (sc && sc.card) || { role: { en: 'Navigator', ja: '解説' }, personality: { en: name + ' explains what Shizue-sensei does.', ja: '静江先生のお点前を解説します。' }, traits: [] },
-    greeting: (sc && sc.greeting) || { ja: nameJa + 'です。', en: 'I am ' + name + '.', yomi: '' },
-    script: sc,
-  };
-}
-// the teacher whose body makes the tea: a navigator's performer, else the teacher itself
-const performerOf = (T) => (T && T.performer && TEACHERS[T.performer]) || T;
-const isNavigatorTeacher = (T) => !!T && T.teaRole === 'navigator';
 // the teacher in charge: #teacher=<id> in the address (for tools and links), else the last choice, else shizue
 let TEACHER = TEACHERS.shizue;
 {
@@ -159,27 +105,24 @@ function rememberTeacher(id) {
 const unitOk = (u) => u && typeof u === 'object' && typeof u.en === 'string' && (u.ja == null || typeof u.ja === 'string');
 function teacherLines(i) {
   return STEPS[i].lines.map((l, k) => {
-    const narrator = narratorForTurn(k);
-    const sc = narrator.script && narrator.script.steps && narrator.script.steps[i];
+    const sc = TEACHER.script?.steps?.[i];
     const u = sc && sc.lines && sc.lines[k] && sc.lines[k][1];
-    return [l[0], narratedUnit(pairIntro(unitOk(u) ? u : l[1], i, k), narrator)];
+    return [l[0], unitOk(u) ? u : l[1]];
   });
 }
 function teacherQs(i) {
   // the question stays English (the page's language); the answer is the teacher's
   return STEPS[i].qs.map((q, k) => {
-    const narrator = narratorForTurn(k);
-    const sc = narrator.script && narrator.script.steps && narrator.script.steps[i];
+    const sc = TEACHER.script?.steps?.[i];
     const a = sc && sc.qs && sc.qs[k] && sc.qs[k][1];
-    return [q[0], narratedUnit(unitOk(a) ? a : q[1], narrator)];
+    return [q[0], unitOk(a) ? a : q[1]];
   });
 }
 function teacherSays(key, k, fallback) {
   // guestIntro / guestDrink (arrays, index k) or a single unit (whiskDone)
-  const narrator = narratorForTurn(k);
-  const sc = narrator.script;
+  const sc = TEACHER.script;
   let u = sc && sc[key];
   if (Array.isArray(u)) u = u[k];
-  return narratedUnit(unitOk(u) ? u : fallback, narrator);
+  return unitOk(u) ? u : fallback;
 }
 const unitText = (u) => (typeof u === 'string' ? u : u.ja || u.en);

@@ -97,8 +97,8 @@ function setPhase(i) {
   phaseBtn = null;
   const said = teacherSays('guestIntro', i, ph.text);
   showLine(said);
-  speak(said); // before navTalk (see 52-navigator navLine)
-  navTalk(said);
+  speak(said);
+  lineTalk(said);
   ui.meter.querySelector('.bar').style.display = i === 2 ? '' : 'none';
   ui.meterText.textContent = i === 2 ? 'Move your pointer quickly over the bowl to whisk, or press the left and right arrow keys in turn.' : 'Tap the glowing item, or use the button.';
   if (ph.btn) {
@@ -212,7 +212,6 @@ function stopDrinkView() {
   drinkView = false;
   document.documentElement.classList.remove('bowl-view');
   document.getElementById('camBowl').setAttribute('aria-pressed','false');
-  if (typeof navPlace === 'function') navPlace();
 }
 function setDrinkView(on) {
   drinkView = on;
@@ -221,7 +220,6 @@ function setDrinkView(on) {
   if (on) {
     document.getElementById('ask').classList.remove('open');
     for (const id of ['camGuest','camClose','camTop']) document.getElementById(id).setAttribute('aria-pressed','false');
-    navPlace();
   } else goCam('guest');
 }
 document.getElementById('camBowl').addEventListener('click',()=>setDrinkView(!drinkView));
@@ -277,7 +275,7 @@ function advanceSeq() {
   showLine(said);
   if (st.say) speak(st.say, st.sayJa); // the guest's own phrase, in Japanese, as before
   else speak(said);
-  navTalk(said); // after speak (see 52-navigator navLine)
+  lineTalk(said);
   poseFrom = pose.slice();
   pose = st.pose.slice();
   poseT = 0;

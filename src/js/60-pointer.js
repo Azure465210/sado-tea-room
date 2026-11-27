@@ -115,8 +115,8 @@ function whiskAt(dx, dz, gain) {
     ui.meterText.textContent = `Beautiful foam in ${((performance.now() - game.t0) / 1000).toFixed(1)} seconds. Now drink it as a guest.`;
     const said = teacherSays('whiskDone', 0, 'Well done. Now receive the bowl as a guest: press Drink and follow the steps.');
     showLine(said);
-    speak(said); // before navTalk: the navigator window must see this line's voice state, not the cancelled one (52-navigator)
-    navTalk(said);
+    speak(said);
+    lineTalk(said);
     const b = document.createElement('button');
     b.className = 'btn primary';
     b.textContent = 'Drink';

@@ -193,8 +193,7 @@ export function InstructorSelect({
         </div>
         <h2 className="ss-title">{heading}</h2>
         <p className="ss-sub">
-          Performers make the tea themselves. With a navigator, Shizue-sensei makes the tea and the navigator explains each
-          step from a small window, in their own voice.
+          Choose Shizue-sensei or Urone If to perform the tea ceremony and guide you through each step.
         </p>
       </header>
 
@@ -230,9 +229,7 @@ export function InstructorSelect({
       <footer className="ss-footer">
         <p>{GENERAL_CREDIT}</p>
         <p>
-          VOICEVOX characters, when that engine is used: <span lang="ja">VOICEVOX:ずんだもん, VOICEVOX:四国めたん, VOICEVOX:春日部つむぎ,
-          VOICEVOX:東北ずん子, VOICEVOX:東北きりたん, VOICEVOX:東北イタコ</span>. 虚音イフ, when the COEIROINK engine is used:{' '}
-          <span lang="ja">COEIROINK:虚音イフ</span>. Yukkuri Reimu and Yukkuri Marisa are fan characters derived from Touhou Project.
+          Voice credit when using the local COEIROINK engine: <span lang="ja">COEIROINK:虚音イフ</span>.
         </p>
       </footer>
 

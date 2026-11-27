@@ -1,6 +1,5 @@
 /* Instructor selector styles. Tailwind runs without preflight and every utility is scoped to #sado-selector
-   (tailwind.config.cjs); the hand-written rules below are scoped the same way, so nothing here can restyle the tea room.
-   The navigator window (.sado-nav) is mounted outside #sado-selector and has its own self-contained rules. */
+   (tailwind.config.cjs); the hand-written rules below are scoped the same way, so nothing here can restyle the tea room. */
 @tailwind components;
 @tailwind utilities;
 
@@ -38,7 +37,7 @@
   margin: 0;
   padding: 0;
 }
-#sado-selector :where(.ss-root button, .ss-demo-bar button) {
+#sado-selector :where(.ss-root button) {
   font: inherit;
   color: inherit;
   background: none;
@@ -102,7 +101,7 @@
 }
 #sado-selector .ss-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px 4px;
 }
 
@@ -304,20 +303,17 @@
   align-items: flex-end;
   height: 14px;
 }
-#sado-selector .ss-card-talk i,
-.sado-nav .sado-nav-wave i {
+#sado-selector .ss-card-talk i {
   display: block;
   width: 3px;
   height: 100%;
   background: var(--accent);
   animation: ss-wave 0.8s ease-in-out infinite;
 }
-#sado-selector .ss-card-talk i:nth-child(2),
-.sado-nav .sado-nav-wave i:nth-child(2) {
+#sado-selector .ss-card-talk i:nth-child(2) {
   animation-delay: -0.25s;
 }
-#sado-selector .ss-card-talk i:nth-child(3),
-.sado-nav .sado-nav-wave i:nth-child(3) {
+#sado-selector .ss-card-talk i:nth-child(3) {
   animation-delay: -0.5s;
 }
 @keyframes ss-wave {
@@ -361,8 +357,7 @@
   height: 100%;
   object-fit: contain;
 }
-#sado-selector .ss-emblem,
-.sado-nav .ss-emblem {
+#sado-selector .ss-emblem {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -592,126 +587,8 @@
   animation: none !important;
 }
 @media (prefers-reduced-motion: reduce) {
-  #sado-selector .ss-root *,
-  .sado-nav * {
+  #sado-selector .ss-root * {
     transition: none !important;
     animation: none !important;
   }
-}
-
-/* ---------- demo page only ---------- */
-#sado-selector .ss-demo-bar {
-  max-width: 1240px;
-  margin: 0 auto;
-  padding: 0 24px 12px;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 12px;
-  color: #f1eadc;
-  font-family: system-ui, sans-serif;
-  font-size: 13px;
-}
-#sado-selector .ss-demo-bar .ss-btn {
-  font: inherit;
-  font-weight: 700;
-  cursor: pointer;
-  padding: 6px 16px;
-}
-#sado-selector .ss-demo-nav {
-  max-width: 1240px;
-  margin: 0 auto 32px;
-  padding: 0 24px;
-}
-#sado-selector .ss-demo-nav .sado-nav {
-  width: 200px;
-}
-
-/* ---------- navigator window (self-contained; may live outside #sado-selector) ---------- */
-.sado-nav {
-  --nav-ink: #f1eadc;
-  position: relative;
-  width: 100%;
-  max-width: 240px;
-  box-sizing: border-box;
-  font-family: system-ui, -apple-system, 'Segoe UI', 'Hiragino Kaku Gothic ProN', 'Yu Gothic UI', sans-serif;
-  color: var(--nav-ink);
-  line-height: 1.2;
-}
-.sado-nav *,
-.sado-nav *::before,
-.sado-nav *::after {
-  box-sizing: border-box;
-}
-.sado-nav .sado-nav-frame {
-  position: relative;
-  padding: 3px;
-  background: linear-gradient(150deg, var(--accent), #2a2f33 60%);
-  clip-path: polygon(16px 0, 100% 0, 100% calc(100% - 16px), calc(100% - 16px) 100%, 0 100%, 0 16px);
-  transition: filter 0.25s;
-}
-.sado-nav.is-talking .sado-nav-frame {
-  filter: drop-shadow(0 0 6px var(--accent)) brightness(1.08);
-}
-.sado-nav .sado-nav-view {
-  position: relative;
-  aspect-ratio: 1 / 1;
-  overflow: hidden;
-  background: radial-gradient(ellipse 70% 60% at 50% 40%, rgba(255, 255, 255, 0.16), transparent 70%),
-    linear-gradient(170deg, #2c3438, #14181a);
-  clip-path: polygon(14px 0, 100% 0, 100% 100%, 0 100%, 0 14px);
-}
-.sado-nav .sado-nav-view canvas {
-  display: block;
-}
-.sado-nav .ss-fallback2d {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-}
-.sado-nav .sado-nav-plate {
-  position: relative;
-  display: flex;
-  align-items: baseline;
-  flex-wrap: wrap;
-  gap: 2px 8px;
-  padding: 5px 34px 6px 10px;
-  background: #101315;
-  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 13px), calc(100% - 13px) 100%, 0 100%);
-}
-.sado-nav .sado-nav-plate::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  bottom: 0;
-  width: 5px;
-  background: var(--accent);
-}
-.sado-nav .sado-nav-en {
-  font-size: 13px;
-  font-weight: 900;
-  font-style: italic;
-  text-transform: uppercase;
-  letter-spacing: 0.01em;
-  transform: skewX(-8deg);
-}
-.sado-nav .sado-nav-ja {
-  font-family: 'Hiragino Mincho ProN', 'Yu Mincho', 'Noto Serif JP', serif;
-  font-size: 11px;
-  color: var(--accent);
-}
-.sado-nav .sado-nav-wave {
-  position: absolute;
-  right: 12px;
-  top: 50%;
-  display: flex;
-  gap: 2px;
-  height: 12px;
-  margin-top: -6px;
-  opacity: 0;
-  transition: opacity 0.2s;
-}
-.sado-nav.is-talking .sado-nav-wave {
-  opacity: 1;
 }

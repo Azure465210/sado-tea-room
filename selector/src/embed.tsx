@@ -1,12 +1,10 @@
 // Library entry for the tea room page: exposes window.SadoSelector (one IIFE + one CSS file, see vite.config.ts).
 //   SadoSelector.characters
 //   SadoSelector.mountSelector(el, { currentId, onChoose(id), speak(id, {explicit}), onEnter, enterLabel }) → { setCurrent(id), dispose() }
-//   SadoSelector.mountNavigator(el, { id })                                → { setTalking(b), setId(id), dispose() }
 import './index.css';
 import { createRoot, type Root } from 'react-dom/client';
 import { CHARACTERS, type Character } from './data/characters';
 import { InstructorSelect } from './components/InstructorSelect';
-import { NavigatorWindow } from './components/NavigatorWindow';
 
 export interface MountSelectorOptions {
   currentId?: string | null;
@@ -22,12 +20,6 @@ export interface SelectorHandle {
   setCurrent: (id: string) => void;
   dispose: () => void;
 }
-export interface NavigatorHandle {
-  setTalking: (talking: boolean) => void;
-  setId: (id: string) => void;
-  dispose: () => void;
-}
-
 const SCOPE_ID = 'sado-selector';
 
 /** Tailwind utilities only apply inside #sado-selector: reuse el (or an ancestor) with that id, or add one inside el */
@@ -95,38 +87,7 @@ function mountSelector(el: HTMLElement, opts: MountSelectorOptions = {}): Select
   return handle;
 }
 
-function mountNavigator(el: HTMLElement, opts: { id: string }): NavigatorHandle {
-  if (!el) throw new Error('SadoSelector.mountNavigator: no element');
-  const container = document.createElement('div');
-  container.className = 'sado-nav-mount';
-  el.appendChild(container);
-  const root = createRoot(container);
-  let id = opts && opts.id ? opts.id : 'zundamon';
-  let talking = false;
-  let disposed = false;
-  const render = () => root.render(<NavigatorWindow id={id} talking={talking} />);
-  render();
-  return {
-    setTalking(b: boolean) {
-      if (disposed || talking === !!b) return;
-      talking = !!b;
-      render();
-    },
-    setId(next: string) {
-      if (disposed || next === id) return;
-      id = next;
-      render();
-    },
-    dispose() {
-      if (disposed) return;
-      disposed = true;
-      root.unmount();
-      container.remove();
-    },
-  };
-}
-
-const api = { characters: CHARACTERS, mountSelector, mountNavigator };
+const api = { characters: CHARACTERS, mountSelector };
 
 declare global {
   interface Window {

@@ -53,7 +53,7 @@ function advance(dt) {
       speak(u);
       // a PC engine (VOICEVOX / COEIROINK) makes the next line while this one plays, so it starts on time (06-tts cache)
       if (voiceOn && TTS.prefetch && tl[lineIdx + 1]) TTS.prefetch(tl[lineIdx + 1][1]);
-      lineTalk(u); // the host's mouth, or the navigator window when a navigator speaks (52-navigator)
+      lineTalk(u);
       lineIdx++;
     }
     if (t >= d && lineIdx >= s.lines.length && !(voiceOn && TTS.busy)) {

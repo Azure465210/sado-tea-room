@@ -42,10 +42,6 @@ const lineEn = document.getElementById('lineEn');
 let displayedLine = '';
 function showLine(u = '') {
   displayedLine = u;
-  const speakerLabel = document.getElementById('lineSpeaker');
-  const speaker = u && TEACHERS[u.speaker];
-  speakerLabel.hidden = !speaker;
-  speakerLabel.textContent = speaker ? speaker.name : '';
   if (typeof u === 'string' || TTS.language === 'en' || !u.ja) {
     ui.line.textContent = typeof u === 'string' ? u : u.en;
     ui.line.lang = 'en';
@@ -65,6 +61,9 @@ function talkTime(u) {
     return Math.min(4.5, 0.6 + text.length * 0.045);
   }
   return Math.min(6, 0.6 + (u.yomi || u.ja).length * 0.13);
+}
+function lineTalk(unit) {
+  hostState.talkUntil = performance.now() / 1000 + talkTime(unit);
 }
 function applyInit(s) {
   if (s.init) {
@@ -164,11 +163,6 @@ function loadStep(i) {
       en.className = 'a-en';
       en.textContent = a.en;
       ans.append(ja, en);
-      if (a.speaker) {
-        const who = document.createElement('strong');
-        who.textContent = TEACHERS[a.speaker].name + ': ';
-        ans.prepend(who);
-      }
     }
     ans.hidden = true;
     b.addEventListener('click', () => {
@@ -223,7 +217,7 @@ document.getElementById('guestClose').addEventListener('click', () => {
   guestPanel.hidden = true;
 });
 // ---------- the intro page: choose the teacher ----------
-const intro = { el: document.getElementById('intro'), cards: document.getElementById('teacherCards'), pick: TEACHER.id, pair: PAIR_ID, entered: false, built: false };
+const intro = { el: document.getElementById('intro'), cards: document.getElementById('teacherCards'), pick: TEACHER.id, entered: false, built: false };
 const voicePick = document.getElementById('voicePick');
 function buildTeacherCards() {
   intro.cards.innerHTML = '';
@@ -351,7 +345,6 @@ function speakGreeting(id, o) {
 }
 function pickTeacher(id, fromSelector) {
   intro.pick = id;
-  if (fromSelector || (intro.pair && NARRATOR_PAIRS[intro.pair].members[0] !== id)) intro.pair = '';
   if (intro.selector) {
     if (!fromSelector) intro.selector.setCurrent(id);
   } else
@@ -363,7 +356,6 @@ function pickTeacher(id, fromSelector) {
   updateVoiceCopy();
   if (TTS.showFor) TTS.showFor(id);
   fillVoicePick();
-  updatePairPicker();
 }
 // the Voice selector: the installed voices of the chosen teacher's language, best first; "Automatic" uses the ranking
 function updateVoiceCopy() {
@@ -405,7 +397,6 @@ for (const control of languageControls) {
     TTS.setLanguage(control.value);
     syncLanguage();
     updateVoiceCopy();
-    updatePairPicker();
     fillVoicePick();
     showLine(displayedLine);
     if (intro.el.hidden && voiceOn && playing && displayedLine) {
@@ -416,7 +407,6 @@ for (const control of languageControls) {
 }
 syncLanguage();
 function openIntro() {
-  intro.pair = PAIR_ID;
   document.getElementById('start').textContent = intro.entered ? 'Back to the tea room' : 'Enter the tea room'; // before the selector renders (it shows the same label)
   if (!intro.built) buildSelector();
   pickTeacher(TEACHER.id);
@@ -444,13 +434,12 @@ function setBehind(off) {
 // make a teacher the host: rebuild the avatar, recolour the fukusa, retell the texts. Restarts at step 1.
 function setTeacher(id) {
   if (!TEACHERS[id]) return false;
-  const changed = TEACHER.id !== id,
-    newBody = performerOf(TEACHER) !== performerOf(TEACHERS[id]); // navigators keep shizue's body
+  const changed = TEACHER.id !== id;
   TEACHER = TEACHERS[id];
   rememberTeacher(id);
-  if (newBody) {
+  if (changed) {
     AVATAR.dispose();
-    AVATAR = makeAvatar(performerOf(TEACHER));
+    AVATAR = makeAvatar(TEACHER);
   }
   applyTeacher();
   return changed;
@@ -460,33 +449,21 @@ function applyTeacher() {
     O.fukusa.material = O.fukusa.material.clone(); // the silk is shared with the flower in the alcove
     O.fukusa.userData.teacherMat = true;
   }
-  O.fukusa.material.color.set(performerOf(TEACHER).fukusa); // raw hex, like every material here (shizue's stays exactly as it was)
+  O.fukusa.material.color.set(TEACHER.fukusa); // raw hex, like every material here (shizue's stays exactly as it was)
   const tb = document.getElementById('teacherBtn'); // the bare short name so the header stays on one row at 1280px
   const words = TEACHER.name.replace(/-sensei$/, '').split(' '),
     last = words[words.length - 1];
-  tb.textContent = last.length > 2 ? last : words.join(' '); // 'Akane', 'Zundamon', 'Shizue'; 'Urone If' stays whole
+  tb.textContent = last.length > 2 ? last : words.join(' ');
   tb.setAttribute('aria-label', 'Teacher: ' + TEACHER.name + '. Choose another teacher');
   document.getElementById('askTitle').textContent = 'Ask ' + TEACHER.name;
-  const pair = activePair();
-  if (pair) {
-    tb.textContent = pair.name;
-    tb.setAttribute('aria-label', 'Narration team: ' + pair.name + '. Choose another team');
-    document.getElementById('askTitle').textContent = 'Ask ' + pair.name;
-  }
-  navApply(); // show / hide the navigator window (52-navigator)
 }
 document.getElementById('start').addEventListener('click', () => {
   intro.el.hidden = true;
   setBehind(false);
   setVoice(document.getElementById('voiceStart').checked); // this click is the gesture browsers need before they will speak
   paused = false;
-  const oldPair = PAIR_ID;
-  PAIR_ID = intro.pair;
-  try { localStorage.setItem('sado.pair', PAIR_ID); } catch(e) {}
-  const teacherChanged = setTeacher(intro.pick);
-  const changed = teacherChanged || oldPair !== PAIR_ID;
-  // A reload or shared URL restores the actual selected team, not the old hash.
-  try { history.replaceState(null, '', '#' + new URLSearchParams(PAIR_ID ? {pair:PAIR_ID} : {teacher:TEACHER.id})); } catch(e) {}
+  const changed = setTeacher(intro.pick);
+  try { history.replaceState(null, '', '#' + new URLSearchParams({ teacher: TEACHER.id })); } catch (e) {}
   if (!intro.entered) loadStep(0);
   else if (changed) {
     loadStep(0);

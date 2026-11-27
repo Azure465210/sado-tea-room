@@ -210,32 +210,13 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);over
 #enginePanel summary{cursor:pointer;color:var(--ink);font-weight:500}
 #enginePanel details ul{margin:4px 0 0;padding-left:18px;display:grid;gap:3px}
 #enginePanel code{font-size:.8em;overflow-wrap:anywhere}
-/* the 3D instructor selector (React bundle, styles inlined below) inside the intro page; the navigator window */
+/* the 3D instructor selector (React bundle, styles inlined below) inside the intro page */
 #intro.has-selector>.card{max-width:1240px;padding:20px 20px 22px}
 #intro.has-selector .selector-host{min-width:0;background:linear-gradient(170deg,#1d2427,#121618 70%);border-radius:14px;color-scheme:dark}
 #intro.has-selector .selector-host #sado-selector .ss-root{padding:16px 18px 18px}
 #intro.has-selector #start{justify-self:center;min-width:min(300px,100%);box-shadow:0 6px 18px rgba(0,0,0,.3)}
 /* sticky only on phones, where the card list is long; scroll-padding keeps a focused card clear of it */
 @media (max-width:640px){#intro.has-selector #start{position:sticky;bottom:10px;z-index:3}#intro.has-selector{scroll-padding-bottom:72px}}
-#navWin{position:absolute;right:16px;bottom:16px;width:200px;z-index:1}
-#navWin,#navWin *{pointer-events:none!important}
-#navWin[hidden]{display:none}
-#navWin .sado-nav{max-width:none;filter:drop-shadow(0 4px 10px rgba(0,0,0,.28))}
-#navWin.compact .sado-nav-plate{padding:3px 8px 4px 9px}
-#navWin.compact .sado-nav-en{font-size:10.5px}
-#navWin.compact .sado-nav-ja{font-size:9.5px}
-#navWin.compact .sado-nav-wave{display:none}
-#navWin.duo{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
-#navWin.duo[hidden]{display:none}
-#navWin.duo .sado-nav-plate{padding:5px 8px 7px 10px;min-height:44px}
-#navWin.duo .sado-nav-en{font-size:11px}
-#navWin.duo .sado-nav-wave{display:none}
-#lineSpeaker{font-size:12px;font-weight:600;color:var(--matcha);margin-top:6px}
-.pair-picker{background:var(--matcha-soft);border:1px solid var(--matcha);border-radius:12px;padding:14px;margin:14px 0;display:grid;gap:8px}
-.pair-picker label{font-weight:600}
-.pair-picker select{width:100%;font:inherit;padding:10px;border-radius:8px;color:#26342b;background:#fff;border:1px solid #9ca992}
-.pair-picker p{margin:0;font-size:13px}
-.pair-picker .pair-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 @media (max-width:640px){#intro.has-selector>.card{padding:12px 10px 16px}#intro.has-selector .selector-host #sado-selector .ss-root{padding:12px 10px 14px}}
 #settingsToggle{margin-left:auto;width:42px;height:42px;padding:0;font-size:25px;display:grid;place-items:center}
 #settingsPanel{position:absolute;right:16px;top:calc(var(--top-h,64px) + 8px);width:min(390px,calc(100vw - 32px));max-height:calc(100% - var(--top-h,64px) - 24px);overflow:auto;padding:16px;background:var(--panel-solid);border:1px solid var(--line);border-radius:16px;z-index:4;box-shadow:0 8px 30px #0003}
@@ -319,7 +300,6 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);over
   <p>You can practise this in Step 9: after whisking, press <b>Drink</b> and follow the prompts.</p>
 </aside>
 
-<div id="navWin" class="ui" hidden></div>
 
 <div id="tip" class="ui" hidden></div>
 
@@ -327,7 +307,6 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);over
   <div id="meter"><div class="bar"><i id="meterFill"></i></div><span id="meterText">Move your pointer quickly over the bowl to whisk.</span></div>
   <div class="sub">
     <div class="t"><span id="stepTitle">Step 1 · Greet the guest</span><span id="stepJp" lang="ja"></span></div>
-    <div id="lineSpeaker" hidden></div>
     <div class="en" id="line" aria-live="polite"></div>
     <div class="en2" id="lineEn" hidden></div>
     <div class="jp" id="hint">Drag to look around · scroll or pinch to zoom</div>
@@ -349,12 +328,6 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);over
   <div class="card">
     <h1>Sado Tea Room<small>A tea ceremony you can watch in your browser</small></h1>
     <p id="introText">No headset needed. Choose your teacher: they will make a bowl of usucha, thin tea, in eight short steps and explain each one. At the end, you whisk a bowl yourself.</p>
-    <div class="pair-picker">
-      <label for="pairPick">Narration team</label>
-      <select id="pairPick" aria-describedby="pairNote"><option value="">Solo · choose an instructor below</option></select>
-      <p id="pairNote">Choose a duo to see both characters and hear them take turns explaining.</p>
-      <div class="pair-actions"><button class="btn primary" id="pairStart" type="button" hidden>Enter with this duo</button><span id="pairSummary" aria-live="polite"></span></div>
-    </div>
     <h2 class="pick-h" id="pickH">Choose your teacher</h2>
     <div class="teachers" id="teacherCards" role="radiogroup" aria-labelledby="pickH"></div>
     <ul id="introTips">
@@ -385,11 +358,9 @@ body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);over
   <details>
     <summary>How to set up</summary>
     <ul>
-      <li>Start VOICEVOX (Zundamon, Shikoku Metan, Kasukabe Tsumugi, the Tohoku sisters) and/or COEIROINK v2 with the 虚音イフ voice on this computer, then tick the box.</li>
-      <li>VOICEVOX: open <code>http://127.0.0.1:50021/setting</code>, set <b>CORS Policy Mode: all</b>, save, and restart the engine.</li>
+      <li>Start COEIROINK v2 with the 虚音イフ voice on this computer, then tick the box. English narration uses the browser voice.</li>
       <li>COEIROINK: if it is running but shows as not found, check that the engine accepts requests from other origins (CORS) and restart it.</li>
       <li>This works from the downloaded HTML file opened on the same PC, not inside the claude.ai preview (the browser blocks it there).</li>
-      <li>Kotonoha Akane and Aoi (A.I.VOICE) and the Yukkuri voices (AquesTalk) cannot be reached from a web page; they use the browser's voices.</li>
     </ul>
   </details>
 </div>

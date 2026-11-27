@@ -6,14 +6,12 @@ function closeSettings(restoreFocus = true) {
   settingsPanel.hidden = true;
   settingsToggle.setAttribute('aria-expanded','false');
   if (restoreFocus) settingsToggle.focus({preventScroll:true});
-  navPlace();
 }
 settingsToggle.addEventListener('click',()=>{
   if (!settingsPanel.hidden) return closeSettings();
   settingsPanel.hidden = false;
   settingsToggle.setAttribute('aria-expanded','true');
   document.getElementById('settingsClose').focus({preventScroll:true});
-  navPlace();
 });
 document.getElementById('settingsClose').addEventListener('click',()=>closeSettings());
 document.addEventListener('keydown',e=>{

@@ -1591,5 +1591,5 @@ function makeAvatar(teacher) {
   const parts = () => ({ sleeves: [ARM[1].sleeve.mesh, ARM[-1].sleeve.mesh], hands: [ARM[1].palm, ARM[-1].palm], cape: CH.cape ? trunkG.children.find((c) => c.geometry === CH.cape.g) : null, tail: CH.tail ? CH.tail.mesh : null, tuft: CH.tuftG || null, hat: CH.hat || null });
   return { update, portraitURL: () => 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(PORTRAIT_SVG), trunkG, headG, dispose, style: STYLE, parts };
 }
-let AVATAR = makeAvatar(performerOf(TEACHER)); // a navigator's lesson is performed by shizue
+let AVATAR = makeAvatar(TEACHER);
 window.__sadoAvatar = () => AVATAR; // tools only (clearance checks)

@@ -2,20 +2,12 @@ Sado Tea Room
 An independent, non-commercial educational tea ceremony project.
 
 Shizue-sensei and the tea room are original to this project.
-The guest instructor models and dialogue are unofficial fan interpretations.
-Character rights remain with their respective creators.
+The Urone If model and dialogue are unofficial fan interpretations.
+Rights to Urone If remain with the original creator.
 
-- Yukkuri Reimu and Yukkuri Marisa are Touhou Project fan works.
-  https://touhou-project.news/guideline/
-- Kotonoha Akane and Kotonoha Aoi are A.I.VOICE characters.
-  https://aivoice.jp/character/kotonoha/
-- Zundamon, Shikoku Metan, Tohoku Zunko, Tohoku Kiritan and Tohoku Itako.
-  https://zunko.jp/guideline.html
-- Kasukabe Tsumugi.
-  https://tsumugi-official.studio.site/rule
 - Urone If (虚音イフ).
   https://hasewoalice.wixsite.com/uroneif/terms-of-use
 
-The public version uses browser voices. No VOICEVOX, COEIROINK,
-AquesTalk or A.I.VOICE audio is included.
+The public version generates voices in the browser. COEIROINK:虚音イフ is the
+voice credit for the optional local engine and model.
 See THIRD-PARTY-NOTICES.txt for the software licenses.

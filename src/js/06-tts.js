@@ -3,7 +3,6 @@
 //   1. VOICEVOX running on the user's PC (http://127.0.0.1:50021) – speaker matched by name, style ノーマル;
 //   2. COEIROINK v2 running on the user's PC (http://127.0.0.1:50032) – speaker matched by name (虚音イフ);
 //   3. the browser's own Web Speech voices, with per-character pitch/rate and a gender-aware voice ranking.
-// A.I.VOICE and AquesTalk have no API a web page can reach, so those characters always use 3.
 // The local engines are used only when the user ticks "Use VOICEVOX / COEIROINK running on this PC" (the engine panel,
 // #enginePanel); the page then probes them with short timeouts and never waits for them. Any failure falls back to 3.
 // Long text is split into sentences and queued: a short pause between sentences sounds more natural, Chrome cuts off a
@@ -44,21 +43,11 @@ const TTS = (function () {
   // engine: 'voicevox' | 'coeiroink' | 'browser'; engineSpeakerName/styleName: matched against the engine's speaker list;
   // web*: the browser voice (language, pitch 0..2, rate, name hints ranked first); gender: 'female' | 'male' | 'unknown'.
   // webPitch is meant for a voice that fits the character; see pitchFor() for the adjustment when it does not.
-  const FEMALE_JA = ['Nanami', 'Kyoko', 'Haruka', 'Ayumi', 'Sayaka', 'Mizuki', 'O-Ren', 'Shiori', 'Mayu', 'Aoi', 'Nanako', 'Google 日本語', '女性'];
   // (the standalone selector demo keeps a copy of webRate / webPitch in selector/src/data/characters.ts: change both together)
   const PROFILES = {
     shizue: { engine: 'browser', engineSpeakerName: null, styleName: null, webLang: 'en', webTag: 'en-GB', webPitch: 1, webRate: 0.92, webVoiceHints: ['Sonia', 'Libby', 'Hazel', 'Serena', 'Kate', 'Moira', 'Tessa', 'Karen', 'Samantha', 'Martha', 'Fiona', 'Susan', 'Zira', 'Aria', 'Jenny', 'female'], gender: 'female' },
     ifu: { engine: 'coeiroink', engineSpeakerName: '虚音イフ', engineMatch: 'イフ', styleName: null, webLang: 'ja', webTag: 'ja-JP', webPitch: 0.85, webPitchMatched: 1, webRate: 0.95, webVoiceHints: ['Keita', 'Ichiro', 'Daichi', 'Naoki', 'Otoya', 'Hattori', '男性', 'male'], gender: 'male' },
-    akane: { engine: 'browser', engineName: 'A.I.VOICE', engineSpeakerName: null, styleName: null, webLang: 'ja', webTag: 'ja-JP', webPitch: 1.2, webRate: 1.08, webVoiceHints: FEMALE_JA, gender: 'female' },
-    aoi: { engine: 'browser', engineName: 'A.I.VOICE', engineSpeakerName: null, styleName: null, webLang: 'ja', webTag: 'ja-JP', webPitch: 1.05, webRate: 0.96, webVoiceHints: FEMALE_JA, gender: 'female' },
-    reimu: { engine: 'browser', engineName: 'AquesTalk', engineSpeakerName: null, styleName: null, webLang: 'ja', webTag: 'ja-JP', webPitch: 1.12, webRate: 1.02, webVoiceHints: FEMALE_JA, gender: 'female' },
-    marisa: { engine: 'browser', engineName: 'AquesTalk', engineSpeakerName: null, styleName: null, webLang: 'ja', webTag: 'ja-JP', webPitch: 0.98, webRate: 1.06, webVoiceHints: FEMALE_JA, gender: 'female' },
-    zundamon: { engine: 'voicevox', engineSpeakerName: 'ずんだもん', styleName: 'ノーマル', webLang: 'ja', webTag: 'ja-JP', webPitch: 1.4, webRate: 1.06, webVoiceHints: [], gender: 'unknown' },
-    metan: { engine: 'voicevox', engineSpeakerName: '四国めたん', styleName: 'ノーマル', webLang: 'ja', webTag: 'ja-JP', webPitch: 1.1, webRate: 0.98, webVoiceHints: FEMALE_JA, gender: 'female' },
-    tsumugi: { engine: 'voicevox', engineSpeakerName: '春日部つむぎ', styleName: 'ノーマル', webLang: 'ja', webTag: 'ja-JP', webPitch: 1.22, webRate: 1.08, webVoiceHints: FEMALE_JA, gender: 'female' },
-    zunko: { engine: 'voicevox', engineSpeakerName: '東北ずん子', styleName: 'ノーマル', webLang: 'ja', webTag: 'ja-JP', webPitch: 1.08, webRate: 0.95, webVoiceHints: FEMALE_JA, gender: 'female' },
-    kiritan: { engine: 'voicevox', engineSpeakerName: '東北きりたん', styleName: 'ノーマル', webLang: 'ja', webTag: 'ja-JP', webPitch: 1.28, webRate: 0.94, webVoiceHints: FEMALE_JA, gender: 'female' },
-    itako: { engine: 'voicevox', engineSpeakerName: '東北イタコ', styleName: 'ノーマル', webLang: 'ja', webTag: 'ja-JP', webPitch: 0.98, webRate: 0.92, webVoiceHints: FEMALE_JA, gender: 'female' },
+
   };
   const escRe = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   const hintRe = (list) => (list && list.length ? new RegExp(list.map(escRe).join('|'), 'i') : null);

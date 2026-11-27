@@ -5,16 +5,6 @@ import { PlaceholderBust } from './Placeholder';
 import { CHARACTERS } from '../data/characters';
 import { ShizueBust } from './ShizueBust';
 import { IfuBust } from './IfuBust';
-import { AkaneBust } from './AkaneBust';
-import { AoiBust } from './AoiBust';
-import { ReimuBust } from './ReimuBust';
-import { MarisaBust } from './MarisaBust';
-import { ZundamonBust } from './ZundamonBust';
-import { MetanBust } from './MetanBust';
-import { TsumugiBust } from './TsumugiBust';
-import { ZunkoBust } from './ZunkoBust';
-import { KiritanBust } from './KiritanBust';
-import { ItakoBust } from './ItakoBust';
 
 export interface BustProps {
   talking: boolean;
@@ -24,16 +14,6 @@ export type BustComponent = ComponentType<BustProps>;
 const REAL: Record<string, BustComponent> = {
   shizue: ShizueBust,
   ifu: IfuBust,
-  akane: AkaneBust,
-  aoi: AoiBust,
-  reimu: ReimuBust,
-  marisa: MarisaBust,
-  zundamon: ZundamonBust,
-  metan: MetanBust,
-  tsumugi: TsumugiBust,
-  zunko: ZunkoBust,
-  kiritan: KiritanBust,
-  itako: ItakoBust,
 };
 
 const placeholders: Record<string, BustComponent> = {};

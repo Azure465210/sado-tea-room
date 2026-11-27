@@ -1,10 +1,9 @@
-// Standalone demo page: the selector, plus a navigator window preview for the chosen character.
+// Standalone demo of the instructor selector.
 import './index.css';
 import { StrictMode, useCallback, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { getCharacter, type Character } from './data/characters';
 import { InstructorSelect } from './components/InstructorSelect';
-import { NavigatorWindow } from './components/NavigatorWindow';
 import { readStore, writeStore } from './components/hooks';
 
 /** demo-only browser voice: speaks the greeting (yomi for Japanese characters) and resolves when done */
@@ -32,33 +31,12 @@ function demoSpeak(c: Character): Promise<void> {
 }
 
 function Demo() {
-  const [chosen, setChosen] = useState<string>(() => readStore('sado.selector.demo.current') || 'shizue');
-  const [talking, setTalking] = useState(false);
+  const [chosen, setChosen] = useState<string>(() => getCharacter(readStore('sado.selector.demo.current'))?.id || 'shizue');
   const onChoose = useCallback((id: string) => {
     setChosen(id);
     writeStore('sado.selector.demo.current', id);
   }, []);
-  const speak = useCallback((c: Character) => {
-    setTalking(true);
-    return demoSpeak(c).finally(() => setTalking(false));
-  }, []);
-  const c = getCharacter(chosen);
-  return (
-    <>
-      <InstructorSelect currentId={chosen} onChoose={onChoose} speak={speak} />
-      <div className="ss-demo-bar">
-        <span>
-          Chosen: <b>{c ? c.nameEn : chosen}</b>
-        </span>
-        <button type="button" className="ss-btn ss-btn-ghost" onClick={() => setTalking((t) => !t)} aria-pressed={talking}>
-          <span className="ss-btn-in">{talking ? 'Stop talking' : 'Navigator: talk'}</span>
-        </button>
-      </div>
-      <div className="ss-demo-nav">
-        <NavigatorWindow id={chosen} talking={talking} />
-      </div>
-    </>
-  );
+  return <InstructorSelect currentId={chosen} onChoose={onChoose} speak={demoSpeak} />;
 }
 
 const el = document.getElementById('root');
